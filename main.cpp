@@ -37,28 +37,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window, Engine& engine);
 
-struct point_light
-{
-    glm::vec3 color;
-    glm::vec3 pos;
-    float intensity;
-}point_light_list[MAX_FIREWORK_NUMBER];
-
-void set_point_light(Shader& blinnphongshader)
-{
-    int count = 0;
-    for (int i = 0; i < firework_list.size(); i++)
-    {
-        if (firework_list[i].already_boom && firework_list[i].life_of_light > 0)
-        {
-            point_light_list[count].color = firework_list[i].light_color;
-            point_light_list[count].intensity = firework_list[i].light_intensity;
-            point_light_list[count].pos = firework_list[i].position;
-            count++;
-        }
-    }
-
-}
+// 传递点光源函数
+void set_point_light(Shader& blinnphongshader);
 
 int main()
 {
@@ -141,23 +121,17 @@ int main()
     return 0;
 }
 
-
-
 // 判断按键并执行相应动作
 void processInput(GLFWwindow* window, Engine& engine)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    // TODO：如果某按键按下，产生烟花
-        // engine.create_firework_random();
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+        engine.create_firework_random();
 }
 
 // 窗口回调函数
@@ -192,4 +166,26 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
+}
+
+// 传递点光源给着色器
+void set_point_light(Shader& blinnphongshader)
+{
+    int count = 0;
+    string struct_string = "light_list[";
+    string color_string = "].color";
+    string pos_string = "].pos";
+    string intensity_string = "].intensity";
+    for (int i = 0; i < firework_list.size(); i++)
+    {
+        if (firework_list[i].already_boom && firework_list[i].life_of_light > 0)
+        {
+            firework* ptr = &firework_list[i];
+            blinnphongshader.setVec3(struct_string + to_string(count) + color_string, ptr->light_color);
+            blinnphongshader.setVec3(struct_string + to_string(count) + pos_string, ptr->position);
+            blinnphongshader.setFloat(struct_string + to_string(count) + intensity_string, ptr->light_intensity);
+            count++;
+        }
+    }
+    blinnphongshader.setInt("num_lights", count);
 }
