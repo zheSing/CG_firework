@@ -41,5 +41,29 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
 
 void generate_cube_vertices(vector<float>& polygon_vertices, vector<int>& polygon_indices)
 {
-
+    float cubev[24] = {
+        -1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+        1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        1.0f,  1.0f,  1.0f,
+    };
+    int cubei[24] = {
+        0, 2, 3, 1,
+        0, 4, 6, 2,
+        0, 1, 5, 4,
+        4, 5, 7, 6,
+        1, 3, 7, 5,
+        2, 6, 7, 3,
+    };
+    polygon_vertices.clear();
+    polygon_indices.clear();
+    for (int i = 0; i < 24; i++)
+    {
+        polygon_vertices.push_back(cubev[i]);
+        polygon_indices.push_back(cubei[i]);
+    }
 }

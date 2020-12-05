@@ -9,17 +9,16 @@ using namespace std;
 
 // enum polygon { sphere, cube };
 
-int vertex_size[POLYGON_NUM] = { 100, 0 };
-int index_size[POLYGON_NUM] = { 100, 0 };
+vector<float> sphere_vertices;
+vector<int> sphere_indices;
 
-float sphere_vertices[] = { 0.0f, 0.0f, 0.0f };
-int sphere_indices[] = { 0, 1, 2 };
+vector<float> cube_vertices;
+vector<int> cube_indices;
 
-float cube_vertices[] = { 0.0f, 0.0f, 0.0f };
-int cube_indices[] = { 0, 1, 2 };
+vector<float>* vertices[] = { &sphere_vertices, &cube_vertices };
+vector<int>* indices[] = { &sphere_indices, &cube_indices };
 
-float* vertices[POLYGON_NUM] = { sphere_vertices, cube_vertices };
-int* indices[POLYGON_NUM] = { sphere_indices, cube_indices };
+void init_vertices();
 
 class Draw
 {
@@ -28,6 +27,6 @@ private:
 public:
     Draw();
     ~Draw();
-    void draw_polygon(glm::vec3 position, float radius, polygon type, Shader& myshader);
+    void draw_polygon(glm::vec3 position, float radius, glm::vec4 color, polygon type, Shader& myshader);
     void draw_firework(firework* fw, Shader& myshader);
 };

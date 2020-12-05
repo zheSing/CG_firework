@@ -2,6 +2,7 @@
 #define POLYGON_NUM 2
 
 const unsigned int MAX_GRAIN_PER_FIREWORK = 10;
+const unsigned int MAX_FIREWORK_NUMBER = 15;
 
 enum polygon { sphere, cube };
 enum fireworktype { mudan };

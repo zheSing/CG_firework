@@ -37,6 +37,28 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window, Engine& engine);
 
+struct point_light
+{
+    glm::vec3 color;
+    glm::vec3 pos;
+    float intensity;
+}point_light_list[MAX_FIREWORK_NUMBER];
+
+void set_point_light(Shader& blinnphongshader)
+{
+    int count = 0;
+    for (int i = 0; i < firework_list.size(); i++)
+    {
+        if (firework_list[i].already_boom && firework_list[i].life_of_light > 0)
+        {
+            point_light_list[count].color = firework_list[i].light_color;
+            point_light_list[count].intensity = firework_list[i].light_intensity;
+            point_light_list[count].pos = firework_list[i].position;
+            count++;
+        }
+    }
+
+}
 
 int main()
 {
