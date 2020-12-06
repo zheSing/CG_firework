@@ -48,7 +48,7 @@ void Draw::draw_firework(firework* fw, Shader& myshader)
     else
         for (int i = 0; i < fw->num_of_grain; i++)
         {
-            grain* grain_ptr = fw->grain_list[i];
+            grain* grain_ptr = fw->grain_list + i;
             draw_polygon(grain_ptr->position, grain_ptr->radius, grain_ptr->color, grain_ptr->shape, myshader);
         }
 }

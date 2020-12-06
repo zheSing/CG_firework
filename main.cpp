@@ -88,7 +88,7 @@ int main()
     //TODO：加载固定模型
 
     // 渲染循环
-    while (true)
+    while (!glfwWindowShouldClose(window))
     {
         // 更新时间
         float currentFrame = glfwGetTime();
@@ -97,6 +97,10 @@ int main()
 
         // 接收输入
         processInput(window, engine);
+
+        // 背景颜色
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 设置普通shaer
         ColorShader.use();
@@ -117,7 +121,12 @@ int main()
         }
 
         //TODO：渲染固定模型
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
+
+    glfwTerminate();
     return 0;
 }
 

@@ -1,3 +1,6 @@
+#ifndef __ENGINE_H__
+#define __ENGINE_H__
+
 #include "firework.h"
 #include <vector>
 using namespace std;
@@ -16,3 +19,5 @@ public:
     // 引擎启动，根据物理定律更新烟花参数
     void engine_forward(firework* fw);
 };
+
+#endif

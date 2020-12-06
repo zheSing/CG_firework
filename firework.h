@@ -1,7 +1,10 @@
+#ifndef __FIREWORK_H__
+#define __FIREWORK_H__
+
 #include<glm-master/glm/glm.hpp>
 #define POLYGON_NUM 2
 
-const unsigned int MAX_GRAIN_PER_FIREWORK = 10;
+const unsigned int MAX_GRAIN_PER_FIREWORK = 30;
 const unsigned int MAX_FIREWORK_NUMBER = 15;
 
 enum polygon { sphere, cube };
@@ -39,6 +42,8 @@ struct firework
 
     int num_of_grain; //粒子数量
 
-    grain* grain_list[MAX_GRAIN_PER_FIREWORK];//粒子
+    grain grain_list[MAX_GRAIN_PER_FIREWORK];//粒子
 
 };
+
+#endif // !__FIREWORK_H__

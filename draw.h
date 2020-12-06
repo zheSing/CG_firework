@@ -1,3 +1,6 @@
+#ifndef __DRAW_H__
+#define __DRAW_H__
+
 #include "firework.h"
 #include "shader.h"
 #include <vector>
@@ -8,15 +11,6 @@
 using namespace std;
 
 // enum polygon { sphere, cube };
-
-vector<float> sphere_vertices;
-vector<int> sphere_indices;
-
-vector<float> cube_vertices;
-vector<int> cube_indices;
-
-vector<float>* vertices[] = { &sphere_vertices, &cube_vertices };
-vector<int>* indices[] = { &sphere_indices, &cube_indices };
 
 void init_vertices();
 
@@ -30,3 +24,5 @@ public:
     void draw_polygon(glm::vec3 position, float radius, glm::vec4 color, polygon type, Shader& myshader);
     void draw_firework(firework* fw, Shader& myshader);
 };
+
+#endif

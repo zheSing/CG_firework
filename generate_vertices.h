@@ -1,9 +1,21 @@
+#ifndef __GENERATE_VERTICES_H__
+#define __GENERATE_VERTICES_H__
+
 #include <vector>
 #include <glm-master/glm/glm.hpp>
 #include <iostream>
 #include <fstream>
 #define PI 3.14159265358979323846
 using namespace std;
+
+vector<float> sphere_vertices;
+vector<int> sphere_indices;
+
+vector<float> cube_vertices;
+vector<int> cube_indices;
+
+vector<float>* vertices[] = { &sphere_vertices, &cube_vertices };
+vector<int>* indices[] = { &sphere_indices, &cube_indices };
 
 // 生成球的顶点
 void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& polygon_indices)
@@ -67,3 +79,5 @@ void generate_cube_vertices(vector<float>& polygon_vertices, vector<int>& polygo
         polygon_indices.push_back(cubei[i]);
     }
 }
+
+#endif
