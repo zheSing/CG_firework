@@ -7,8 +7,8 @@
 const unsigned int MAX_GRAIN_PER_FIREWORK = 30;
 const unsigned int MAX_FIREWORK_NUMBER = 15;
 
-enum polygon { sphere, cube };
-enum fireworktype { mudan };
+enum polygon { sphere_t, cube_t };
+enum fireworktype { mudan_t };
 
 struct grain
 {
@@ -40,7 +40,7 @@ struct firework
 
     fireworktype boom_type;//爆炸方式
 
-    int num_of_grain; //粒子数量
+    int grain_cnt; //粒子数量
 
     grain grain_list[MAX_GRAIN_PER_FIREWORK];//粒子
 

@@ -5,7 +5,7 @@
 #include <glm-master/glm/glm.hpp>
 #include <iostream>
 #include <fstream>
-#define PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 using namespace std;
 
 vector<float> sphere_vertices;
@@ -32,9 +32,9 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
         {
             float xseg = (float)x / (float)xmax;
             float yseg = (float)y / (float)ymax;
-            float xPos = std::cos(xseg * 2.0f * PI) * std::sin(yseg * PI);
-            float yPos = std::cos(yseg * PI);
-            float zPos = std::sin(xseg * 2.0f * PI) * std::sin(yseg * PI);
+            float xPos = std::cos(xseg * 2.0f * M_PI) * std::sin(yseg * M_PI);
+            float yPos = std::cos(yseg * M_PI);
+            float zPos = std::sin(xseg * 2.0f * M_PI) * std::sin(yseg * M_PI);
             sphere_vertices.push_back(xPos);
             sphere_vertices.push_back(yPos);
             sphere_vertices.push_back(zPos);

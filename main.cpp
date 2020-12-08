@@ -20,11 +20,11 @@ const unsigned int SCR_HEIGHT = 600;
 vector<firework> firework_list;
 
 // 摄像机
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 150.0f, 225.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 float NEAR = 0.1f;
-float FAR = 100.0f;
+float FAR = 300.0f;
 bool firstMouse = true;
 
 // 时间
@@ -36,6 +36,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window, Engine& engine);
+bool ENTER_PRESS = false;
 
 // 传递点光源函数
 void set_point_light(Shader& blinnphongshader);
@@ -115,10 +116,10 @@ int main()
 
         // 渲染烟花系统
         for (int i = 0; i < firework_list.size(); i++)
-        {
             draw.draw_firework(&firework_list[i], ColorShader);
-            engine.engine_forward(&firework_list[i]);
-        }
+
+        // 应用烟花引擎
+        engine.forward();
 
         //TODO：渲染固定模型
 
@@ -140,7 +141,13 @@ void processInput(GLFWwindow* window, Engine& engine)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
-        engine.create_firework_random();
+    {
+        if (!ENTER_PRESS)
+            engine.create_firework_random(mudan_t);
+        ENTER_PRESS = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
+        ENTER_PRESS = false;
 }
 
 // 窗口回调函数
