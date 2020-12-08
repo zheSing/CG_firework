@@ -23,7 +23,7 @@ static 	glm::vec3 sample_vel() {
     return noise * glm::vec3(cos(theta) * sin(phi), sin(theta) * sin(phi), cos(phi));
 }
 
-Engine::Engine(vector<firework>* ptr, float delta = 0.3f, float g = -0.2f)
+Engine::Engine(vector<firework>* ptr, float delta, float g)
 {
     this->g = g;
     this->delta = delta;
@@ -31,7 +31,7 @@ Engine::Engine(vector<firework>* ptr, float delta = 0.3f, float g = -0.2f)
 }
 
 // 产生一个烟花，随机初始化参数
-void Engine::create_firework_random(fireworktype type = mudan_t)
+void Engine::create_firework_random(fireworktype type)
 {
     firework fw;
 
@@ -67,7 +67,7 @@ void Engine::create_firework_random(fireworktype type = mudan_t)
 }
 
 // 根据烟花类型爆炸产生粒子
-void Engine::boom_firework(vector<firework>::iterator fw, fireworktype type = mudan_t)
+void Engine::boom_firework(vector<firework>::iterator fw, fireworktype type)
 {
     float explosion_speed = 4.5f;
     grain gn;
