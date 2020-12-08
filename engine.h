@@ -8,16 +8,18 @@ using namespace std;
 class Engine
 {
 private:
+    float g;
+    float delta;
     vector<firework>* firework_list_ptr;
 public:
-    Engine(vector<firework>* ptr);
+    Engine(vector<firework>* ptr, float delta = 0.3f, float g = -0.2f);
     ~Engine();
     // 产生一个烟花，随机初始化参数
-    void create_firework_random(fireworktype type = fireworktype::mudan);
+    void create_firework_random(fireworktype type = fireworktype::mudan_t);
     // 根据烟花类型爆炸产生粒子
-    void boom_firework(firework* fw, fireworktype type = fireworktype::mudan);
+    static void boom_firework(vector<firework>::iterator fw, fireworktype type = fireworktype::mudan_t);
     // 引擎启动，根据物理定律更新烟花参数
-    void engine_forward(firework* fw);
+    void forward();
 };
 
 #endif
