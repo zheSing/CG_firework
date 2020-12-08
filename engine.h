@@ -12,7 +12,7 @@ private:
     float delta;
     vector<firework>* firework_list_ptr;
 public:
-    Engine(vector<firework>* ptr, float delta = 0.3f, float g = -0.2f);
+    Engine(vector<firework>* ptr, float delta, float g);
     ~Engine();
     // 产生一个烟花，随机初始化参数
     void create_firework_random(fireworktype type = fireworktype::mudan_t);
