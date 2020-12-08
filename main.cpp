@@ -198,7 +198,7 @@ void set_point_light(Shader& blinnphongshader)
         {
             firework* ptr = &firework_list[i];
             blinnphongshader.setVec3(struct_string + to_string(count) + color_string, ptr->light_color);
-            blinnphongshader.setVec3(struct_string + to_string(count) + pos_string, ptr->position);
+            blinnphongshader.setVec3(struct_string + to_string(count) + pos_string, ptr->position[POSITION_NUMBER - 1]);
             blinnphongshader.setFloat(struct_string + to_string(count) + intensity_string, ptr->light_intensity);
             count++;
         }

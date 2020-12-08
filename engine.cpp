@@ -44,7 +44,8 @@ void Engine::create_firework_random(fireworktype type)
     fw.life_after_boom = ((float)seed) * 5;
 
     seed = 0 + (rand() % static_cast<int>(5));
-    fw.position = initial_position[seed];
+    fw.position_cnt = 1;
+    fw.position[POSITION_NUMBER - 1] = initial_position[seed];
 
     fw.speed = glm::vec3(0.0f + noise(0.1f), 10.0f + noise(0.1f), 0.0f + noise(0.1f));
 
@@ -71,8 +72,10 @@ void Engine::boom_firework(vector<firework>::iterator fw, fireworktype type)
 {
     float explosion_speed = 4.5f;
     grain gn;
-    for (int i = 0; i < fw->grain_cnt; i++) {
-        gn.position = fw->position;
+    for (int i = 0; i < fw->grain_cnt; i++)
+    {
+        gn.position_cnt = 1;
+        gn.position[POSITION_NUMBER - 1] = fw->position[POSITION_NUMBER - 1];
         gn.speed = explosion_speed * sample_vel();
         gn.color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
         gn.radius = 2.0f;
@@ -89,7 +92,10 @@ void Engine::forward()
     {
         if (!firework_iter->already_boom)
         {
-            firework_iter->position += (firework_iter->speed * dt);
+            firework_iter->position_cnt = min(firework_iter->position_cnt + 1, POSITION_NUMBER);
+            for (int i = 0; i < POSITION_NUMBER - 1; i++)
+                firework_iter->position[i] = firework_iter->position[i + 1];
+            firework_iter->position[POSITION_NUMBER - 1] += (firework_iter->speed * dt);
             firework_iter->speed.y += (g * dt);
             firework_iter->life_before_boom -= dt;
             if (firework_iter->life_before_boom <= 0)
@@ -104,7 +110,10 @@ void Engine::forward()
             for (int i = 0; i < firework_iter->grain_cnt; i++)
             {
                 grain* grain_iter = firework_iter->grain_list + i;
-                grain_iter->position += (grain_iter->speed * dt);
+                grain_iter->position_cnt = min(grain_iter->position_cnt + 1, POSITION_NUMBER);
+                for (int i = 0; i < POSITION_NUMBER - 1; i++)
+                    grain_iter->position[i] = grain_iter->position[i + 1];
+                grain_iter->position[POSITION_NUMBER - 1] += (grain_iter->speed * dt);
                 grain_iter->speed.y += (g * dt);
             }
             firework_iter->life_after_boom -= dt;

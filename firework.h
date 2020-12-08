@@ -3,16 +3,17 @@
 
 #include<glm-master/glm/glm.hpp>
 #define POLYGON_NUM 2
-
-const unsigned int MAX_GRAIN_PER_FIREWORK = 30;
-const unsigned int MAX_FIREWORK_NUMBER = 15;
+#define MAX_GRAIN_PER_FIREWORK 30
+#define MAX_FIREWORK_NUMBER 15
+#define POSITION_NUMBER 4
 
 enum polygon { sphere_t, cube_t };
 enum fireworktype { mudan_t };
 
 struct grain
 {
-    glm::vec3 position;//位置
+    int position_cnt;
+    glm::vec3 position[POSITION_NUMBER];//位置
     glm::vec3 speed;//速度
     glm::vec4 color;//颜色
 
@@ -27,7 +28,8 @@ struct firework
     int life_before_boom;//爆炸前寿命
     int life_after_boom;//爆炸后寿命
 
-    glm::vec3 position;//位置
+    int position_cnt;
+    glm::vec3 position[POSITION_NUMBER];//位置
     glm::vec3 speed;//方向
 
     glm::vec4 color;//颜色
