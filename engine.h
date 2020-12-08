@@ -13,7 +13,6 @@ private:
     vector<firework>* firework_list_ptr;
 public:
     Engine(vector<firework>* ptr, float delta = 0.3f, float g = -0.2f);
-    ~Engine();
     // 产生一个烟花，随机初始化参数
     void create_firework_random(fireworktype type = fireworktype::mudan_t);
     // 根据烟花类型爆炸产生粒子
