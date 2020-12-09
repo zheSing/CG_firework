@@ -23,15 +23,15 @@ void Firework::initialise()
 	hasExploded = false;
 
 	position = glm::vec3(
-		-0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//初始位置x坐标限制在[-0.1,0.1]
-		0.0f,//初始位置y坐标
-		-0.99f	//初始位置z坐标
+		-0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//??????x??????????[-0.1,0.1]
+		0.0f,//??????y????
+		-0.99f	//??????z????
 	);
 
 	velocity = glm::vec3(
-		-0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//初始速度x分量限制在[-0.26,0.26]
-		-0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//初始速度y分量限制在[-0.26,0.26]
-		0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))	//初始速度z分量限制在[0.78,0.98]
+		-0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//??????x??????????[-0.26,0.26]
+		-0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//??????y??????????[-0.26,0.26]
+		0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))	//??????z??????????[0.78,0.98]
 	);
 
 	glm::vec3 xyz(
@@ -42,10 +42,10 @@ void Firework::initialise()
 
 	color = glm::vec4(
 		xyz2rgb(xyz),
-		1.0f	//初始不透明
+		1.0f	//????????
 	);
 
-	radius = 0.006f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));//初始半径限制在[0.004,0.005]
+	radius = 0.006f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));//???????????[0.004,0.005]
 	particleNum = 0;
 	particleAliveNum = 0;
 
@@ -62,14 +62,14 @@ glm::vec3 Firework::getSpherePoint(GLfloat u, GLfloat v)
 }
 
 
-void Firework::velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3> &vertexes)
+void Firework::velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3>& vertexes)
 {
-	// Longitude：经线切分个数
-	// Latitude：纬线切分个数
+	// Longitude????????????
+	// Latitude???????????
 	GLfloat lon_step = 1.0f / Longitude;
 	GLfloat lat_step = 1.0f / Latitude;
-	for (size_t lat = 0; lat < Latitude; lat++) {  // 纬线u
-		for (size_t lon = 0; lon < Longitude; lon++) { // 经线v
+	for (size_t lat = 0; lat < Latitude; lat++) {  // ???u
+		for (size_t lon = 0; lon < Longitude; lon++) { // ????v
 			glm::vec3 point = getSpherePoint(lat * lat_step, lon * lon_step);
 			vertexes.push_back(point);
 		}
@@ -127,8 +127,8 @@ void Firework::move(float dt)
 	if (velocity.z <= 0.0f)
 	{
 		velocity.z = 0;
-		hasExploded = true;//z方向高度达到最大后爆炸
-		color.a = 0.0f;//火箭爆炸后变成完全透明
+		hasExploded = true;//z????????????
+		color.a = 0.0f;//????????????????
 		particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
 
 		particleAliveNum = particleNum * particleNum;
@@ -136,13 +136,13 @@ void Firework::move(float dt)
 		std::vector<glm::vec3> velSample;
 		velocitySample(particleNum, particleNum, velSample);
 
-		GLfloat explosion_speed = 0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02)));//速度大小乘积因子限制在[0.08,0.10]
+		GLfloat explosion_speed = 0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02)));//??????????????????[0.08,0.10]
 
 		for (int i = 0; i < particleNum * particleNum; i++)
 		{
 			particles[i].setPosition(position);
-			particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//均匀速度采样, 使用随机速度采样请注释掉本语句并取消注释下一条语句
-			//particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//随机速度采样
+			particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//??????????, ?????????????????????????????????????
+			//particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//?????????
 
 			glm::vec3 xyz(
 				0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
@@ -152,11 +152,11 @@ void Firework::move(float dt)
 
 			particles[i].setColor(glm::vec4(
 				xyz2rgb(xyz),
-				1.0f	//初始不透明
+				1.0f	//????????
 			));
 
 			particles[i].setRadius(
-				0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001)))//初始半径限制在[0.002,0.003]
+				0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001)))//???????????[0.002,0.003]
 			);
 		}
 

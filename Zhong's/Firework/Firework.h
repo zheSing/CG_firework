@@ -12,31 +12,31 @@ public:
 	void initialise();
 	void move(float);
 	void explode(float);
-	GLboolean isLaunched();	//ÅÐ¶Ï»ð¼ýÊÇ·ñ·¢Éä
-	void updateFramesUntilLaunch();	//¸üÐÂframesUntilLaunch
-	GLboolean isExploded();	//ÅÐ¶Ï»ð¼ýÊÇ·ñ±¬Õ¨
-	glm::vec3 getPosition();//»ñÈ¡»ð¼ýÎ»ÖÃ
-	glm::vec3 getVelocity();//»ñÈ¡»ð¼ýËÙ¶È
-	glm::vec4 getColor();	//»ñÈ¡»ð¼ýÑÕÉ«
-	GLfloat getRadius();	//»ñÈ¡»ð¼ý°ë¾¶
-	GLint getParticleNum();	//»ñÈ¡Á£×Ó×ÜÊý = particleNum * particleNum
-	Particle* getParticles();	//»ñÈ¡Á£×ÓÁÐ±í
+	GLboolean isLaunched();	//ï¿½Ð¶Ï»ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½
+	void updateFramesUntilLaunch();	//ï¿½ï¿½ï¿½ï¿½framesUntilLaunch
+	GLboolean isExploded();	//ï¿½Ð¶Ï»ï¿½ï¿½ï¿½Ç·ï¿½Õ¨
+	glm::vec3 getPosition();//ï¿½ï¿½È¡ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+	glm::vec3 getVelocity();//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+	glm::vec4 getColor();	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½É«
+	GLfloat getRadius();	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ë¾¶
+	GLint getParticleNum();	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ = particleNum * particleNum
+	Particle* getParticles();	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
 private:
-	GLint framesUntilLaunch;//»ð¼ý·¢ÉäÑÓ³ÙÖ¡Êý
-	GLboolean hasExploded;	//»ð¼ýÊÇ·ñ±¬Õ¨
-	glm::vec3 position;		//»ð¼ýÎ»ÖÃ
-	glm::vec3 velocity;		//»ð¼ýËÙ¶È
-	glm::vec4 color;		//»ð¼ýÑÕÉ«
-	GLfloat radius;			//»ð¼ý°ë¾¶
-	static const GLfloat GRAVITY;	//ÖØÁ¦¼ÓËÙ¶È
-	static const GLint minParticleNum = 10;	//»ð¼ý±¬Õ¨²úÉúµÄ×îÐ¡Á£×ÓÊýÁ¿µÄÆ½·½¸ù
-	static const GLint maxParticleNum = 20;	//»ð¼ý±¬Õ¨²úÉúµÄ×î´óÁ£×ÓÊýÁ¿µÄÆ½·½¸ù
-	GLint particleNum;		//»ð¼ý±¬Õ¨²úÉúµÄÁ£×ÓÊýÁ¿µÄÆ½·½¸ù
-	GLint particleAliveNum;		//»ð¼ý±¬Õ¨ºó´æ»îµÄÁ£×ÓÊýÁ¿
-	Particle particles[maxParticleNum*maxParticleNum];	//»ð¼ý±¬Õ¨²úÉúµÄÁ£×ÓÁÐ±í
-	glm::vec3 getSpherePoint(GLfloat, GLfloat);	//¼ÆËãÇòÃæµãµÄ×ø±ê
-	void velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3> &vertexes);	//¾ùÔÈËÙ¶È²ÉÑù
-	glm::vec3 velocitySampleRandom();	//Ëæ»úËÙ¶È²ÉÑù
+	GLint framesUntilLaunch;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó³ï¿½Ö¡ï¿½ï¿½
+	GLboolean hasExploded;	//ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Õ¨
+	glm::vec3 position;		//ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+	glm::vec3 velocity;		//ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+	glm::vec4 color;		//ï¿½ï¿½ï¿½ï¿½ï¿½É«
+	GLfloat radius;			//ï¿½ï¿½ï¿½ï¿½ë¾¶
+	static const GLfloat GRAVITY;	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+	static const GLint minParticleNum = 10;	//ï¿½ï¿½ï¿½ï¿½ï¿½Õ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½
+	static const GLint maxParticleNum = 20;	//ï¿½ï¿½ï¿½ï¿½ï¿½Õ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½
+	GLint particleNum;		//ï¿½ï¿½ï¿½ï¿½ï¿½Õ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½
+	GLint particleAliveNum;		//ï¿½ï¿½ï¿½ï¿½ï¿½Õ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	Particle particles[maxParticleNum * maxParticleNum];	//ï¿½ï¿½ï¿½ï¿½ï¿½Õ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
+	glm::vec3 getSpherePoint(GLfloat, GLfloat);	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	void velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3>& vertexes);	//ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶È²ï¿½ï¿½ï¿½
+	glm::vec3 velocitySampleRandom();	//ï¿½ï¿½ï¿½ï¿½Ù¶È²ï¿½ï¿½ï¿½
 	glm::vec3 rgb2xyz(glm::vec3);	//RGB×ªXYZ
 	glm::vec3 xyz2rgb(glm::vec3);	//XYZ×ªRGB
 };

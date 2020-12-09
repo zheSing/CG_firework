@@ -46,14 +46,14 @@ void Draw::draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec
 }
 
 // 绘图。根据烟花参数渲染图形
-void Draw::draw_firework(firework* fw, Shader& myshader)
+void Draw::draw_firework(Firework* fw, Shader& myshader)
 {
-    if (!fw->already_boom)
-        draw_polygon(fw->position, fw->position_cnt, fw->radius, fw->color, fw->shape, myshader);
+    if (!fw->isExploded())
+        draw_polygon(fw->getPosition(), fw->getPositionCnt(), fw->getRadius(), fw->getColor(), fw->getShape(), myshader);
     else
-        for (int i = 0; i < fw->grain_cnt; i++)
+        for (int i = 0; i < fw->getParticleNum(); i++)
         {
-            grain* grain_ptr = fw->grain_list + i;
-            draw_polygon(grain_ptr->position, grain_ptr->position_cnt, grain_ptr->radius, grain_ptr->color, grain_ptr->shape, myshader);
+            Particle* grain_ptr = fw->getParticles() + i;
+            draw_polygon(grain_ptr->getPosition(), grain_ptr->getPositionCnt(), grain_ptr->getRadius(), grain_ptr->getColor(), grain_ptr->getShape(), myshader);
         }
 }
