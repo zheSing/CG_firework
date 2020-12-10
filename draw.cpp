@@ -26,6 +26,13 @@ Draw::Draw()
     }
 }
 
+Draw::~Draw()
+{
+    glDeleteVertexArrays(POLYGON_NUM, VAO);
+    glDeleteBuffers(POLYGON_NUM, VBO);
+    glDeleteBuffers(POLYGON_NUM, EBO);
+}
+
 // 渲染单个图元
 void Draw::draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec4 color, polygon type, Shader& myshader)
 {
@@ -49,11 +56,15 @@ void Draw::draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec
 void Draw::draw_firework(Firework* fw, Shader& myshader)
 {
     if (!fw->isExploded())
-        draw_polygon(fw->getPosition(), fw->getPositionCnt(), fw->getRadius(), fw->getColor(), fw->getShape(), myshader);
+        draw_polygon(fw->getPositionArr(), fw->getPositionCnt(), fw->getRadius(), fw->getColor(), fw->getShape(), myshader);
     else
         for (int i = 0; i < fw->getParticleNum(); i++)
         {
             Particle* grain_ptr = fw->getParticles() + i;
-            draw_polygon(grain_ptr->getPosition(), grain_ptr->getPositionCnt(), grain_ptr->getRadius(), grain_ptr->getColor(), grain_ptr->getShape(), myshader);
+            if (grain_ptr->getColor().w <= 0.0f)
+            {
+                continue;
+            }
+            draw_polygon(grain_ptr->getPositionArr(), grain_ptr->getPositionCnt(), grain_ptr->getRadius(), grain_ptr->getColor(), grain_ptr->getShape(), myshader);
         }
 }

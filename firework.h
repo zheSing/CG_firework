@@ -54,7 +54,8 @@ public:
 
     GLboolean isExploded();
     GLint getPositionCnt();
-    glm::vec3* getPosition();
+    glm::vec3 getPosition();
+    glm::vec3* getPositionArr();
     glm::vec3 getVelocity();
     glm::vec4 getColor();
     GLfloat getRadius();

@@ -19,6 +19,7 @@ private:
     GLuint VAO[POLYGON_NUM], VBO[POLYGON_NUM], EBO[POLYGON_NUM];
 public:
     Draw();
+    ~Draw();
     void draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec4 color, polygon type, Shader& myshader);
     void draw_firework(Firework* fw, Shader& myshader);
 };

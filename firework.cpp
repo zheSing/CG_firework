@@ -1,4 +1,5 @@
 #include "firework.h"
+#include "generate_vertices.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -30,8 +31,8 @@ void Firework::initialise()
 
     velocity = glm::vec3(
         -0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//��ʼ�ٶ�x����������[-0.26,0.26]
-        -0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//��ʼ�ٶ�y����������[-0.26,0.26]
-        0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))	//��ʼ�ٶ�z����������[0.78,0.98]
+        0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),	//��ʼ�ٶ�z����������[0.78,0.98]
+        -0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52)))//��ʼ�ٶ�y����������[-0.26,0.26]
     );
 
     glm::vec3 xyz(
@@ -121,50 +122,61 @@ void Firework::move(float dt)
     //     return;
     // }
 
-    position_cnt = position_cnt + 1 < POSITION_NUMBER ? position_cnt + 1 : POSITION_NUMBER;
-    for (int i = 0; i < POSITION_NUMBER - 1; i++)
-        this->position[i] = this->position[i + 1];
-    position[POSITION_NUMBER - 1] += (velocity * dt);
-
-    velocity.z += (Firework::GRAVITY * dt);
-
-    if (velocity.z <= 0.0f)
+    if (this->isExploded())
     {
-        velocity.z = 0;
-        hasExploded = true;//z����߶ȴﵽ����ը
-        color.a = 0.0f;//�����ը������ȫ͸��
-        particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
 
-        particleAliveNum = particleNum * particleNum;
+        this->explode(dt);
+    }
 
-        std::vector<glm::vec3> velSample;
-        velocitySample(particleNum, particleNum, velSample);
-
-        GLfloat explosion_speed = 0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02)));//�ٶȴ�С�˻�����������[0.08,0.10]
-
-        for (int i = 0; i < particleNum * particleNum; i++)
+    else
+    {
+        position_cnt = position_cnt + 1 < POSITION_NUMBER ? position_cnt + 1 : POSITION_NUMBER;
+        for (int i = 0; i < POSITION_NUMBER - 1; i++)
         {
-            particles[i].setPosition(position[POSITION_NUMBER - 1]);
-            particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//�����ٶȲ���, ʹ������ٶȲ�����ע�͵�����䲢ȡ��ע����һ�����
-            //particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//����ٶȲ���
-
-            glm::vec3 xyz(
-                0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
-                0.218611598014831543f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.7708090543746948242f - 0.218611598014831543f))),
-                0.0975274890661239624f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8590958118438720703f - 0.0975274890661239624f)))
-            );
-
-            particles[i].setColor(glm::vec4(
-                xyz2rgb(xyz),
-                1.0f	//��ʼ��͸��
-            ));
-
-            particles[i].setRadius(
-                0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001)))//��ʼ�뾶������[0.002,0.003]
-            );
+            this->position[i] = this->position[i + 1];
         }
+        position[POSITION_NUMBER - 1] += (velocity * dt);
 
-        std::cout << "Boom!" << std::endl;
+        velocity.y += (Firework::GRAVITY * dt);
+
+        if (velocity.y + (Firework::GRAVITY * dt) <= 0.0f)
+        {
+            velocity.y = 0;
+            hasExploded = true;//z����߶ȴﵽ����ը
+            color.a = 0.0f;//�����ը������ȫ͸��
+            particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
+
+            particleAliveNum = particleNum * particleNum;
+
+            std::vector<glm::vec3> velSample;
+            velocitySample(particleNum, particleNum, velSample);
+
+            GLfloat explosion_speed = 0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02)));//�ٶȴ�С�˻�����������[0.08,0.10]
+
+            for (int i = 0; i < particleNum * particleNum; i++)
+            {
+                particles[i].setPosition(this->getPosition());
+                particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//�����ٶȲ���, ʹ������ٶȲ�����ע�͵�����䲢ȡ��ע����һ�����
+                //particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//����ٶȲ���
+
+                glm::vec3 xyz(
+                    0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
+                    0.218611598014831543f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.7708090543746948242f - 0.218611598014831543f))),
+                    0.0975274890661239624f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8590958118438720703f - 0.0975274890661239624f)))
+                );
+
+                particles[i].setColor(glm::vec4(
+                    xyz2rgb(xyz),
+                    1.0f	//��ʼ��͸��
+                ));
+
+                particles[i].setRadius(
+                    0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001)))//��ʼ�뾶������[0.002,0.003]
+                );
+            }
+
+            std::cout << "Boom!" << std::endl;
+        }
     }
 }
 
@@ -174,8 +186,8 @@ void Firework::explode(float dt)
     {
         if (particles[i].getColor().a > 0.0f)
         {
-            particles[i].setPosition(particles[i].getPosition()[POSITION_NUMBER - 1] + (particles[i].getVelocity() * dt));
-            particles[i].setVelocity(particles[i].getVelocity() + glm::vec3(0.0f, 0.0f, Particle::GRAVITY * dt));
+            particles[i].setPosition(particles[i].getPosition() + (particles[i].getVelocity() * dt));
+            particles[i].setVelocity(particles[i].getVelocity() + glm::vec3(0.0f, Particle::GRAVITY * dt, 0.0f));
 
             float alphaFactor = 0.000005f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8)));
             particles[i].setColor(particles[i].getColor() - glm::vec4(0.0f, 0.0f, 0.0f, alphaFactor * dt));
@@ -186,10 +198,10 @@ void Firework::explode(float dt)
         }
     }
 
-    if (particleAliveNum == 0)
-    {
-        initialise();
-    }
+    // if (particleAliveNum == 0)
+    // {
+    //     initialise();
+    // }
 }
 
 // GLboolean Firework::isLaunched()
@@ -212,7 +224,12 @@ GLint Firework::getPositionCnt()
     return position_cnt;
 }
 
-glm::vec3* Firework::getPosition()
+glm::vec3 Firework::getPosition()
+{
+    return position[POSITION_NUMBER - 1];
+}
+
+glm::vec3* Firework::getPositionArr()
 {
     return position;
 }

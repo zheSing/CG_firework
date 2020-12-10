@@ -13,7 +13,12 @@ GLint Particle::getPositionCnt()
     return position_cnt;
 }
 
-glm::vec3* Particle::getPosition()
+glm::vec3 Particle::getPosition()
+{
+    return position[POSITION_NUMBER - 1];
+}
+
+glm::vec3* Particle::getPositionArr()
 {
     return position;
 }

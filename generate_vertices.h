@@ -26,12 +26,13 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
     glm::vec3 position = glm::vec3(0.0f);
     float radius = 1.0f;
 
-    const int xmax = 10, ymax = 10, maximum = 100;
-    for (int x = 0; x < xmax; x++)
-        for (int y = 0; y < ymax; y++)
+    const int xymax = 10;
+    const int maximum = xymax * xymax;
+    for (int x = 0; x < xymax; x++)
+        for (int y = 0; y < xymax; y++)
         {
-            float xseg = (float)x / (float)xmax;
-            float yseg = (float)y / (float)ymax;
+            float xseg = (float)x / (float)xymax;
+            float yseg = (float)y / (float)xymax;
             float xPos = std::cos(xseg * 2.0f * M_PI) * std::sin(yseg * M_PI);
             float yPos = std::cos(yseg * M_PI);
             float zPos = std::sin(xseg * 2.0f * M_PI) * std::sin(yseg * M_PI);
@@ -39,15 +40,15 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
             sphere_vertices.push_back(yPos);
             sphere_vertices.push_back(zPos);
         }
-    for (int i = 0;i < xmax;i++)
-        for (int j = 0;j < ymax;j++)
+    for (int i = 0;i < xymax;i++)
+        for (int j = 0;j < xymax;j++)
         {
-            sphere_indices.push_back((i * ymax + j) % maximum);
-            sphere_indices.push_back(((i + 1) * ymax + j) % maximum);
-            sphere_indices.push_back(((i + 1) * ymax + j + 1) % maximum);
-            sphere_indices.push_back((i * ymax + j) % maximum);
-            sphere_indices.push_back(((i + 1) * ymax + j + 1) % maximum);
-            sphere_indices.push_back((i * ymax + j + 1) % maximum);
+            sphere_indices.push_back((i * xymax + j) % maximum);
+            sphere_indices.push_back(((i + 1) * xymax + j) % maximum);
+            sphere_indices.push_back(((i + 1) * xymax + j + 1) % maximum);
+            sphere_indices.push_back((i * xymax + j) % maximum);
+            sphere_indices.push_back(((i + 1) * xymax + j + 1) % maximum);
+            sphere_indices.push_back((i * xymax + j + 1) % maximum);
         }
 }
 

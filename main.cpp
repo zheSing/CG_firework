@@ -2,7 +2,6 @@
 #include "draw.h"
 #include "camera.h"
 #include "shader.h"
-#include "engine.h"
 #include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -17,7 +16,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 // 烟花列表
-vector<firework> firework_list;
+vector<Firework> firework_list;
 
 // 摄像机
 Camera camera(glm::vec3(0.0f, 150.0f, 225.0f));
@@ -35,7 +34,7 @@ float lastFrame = 0.0f;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window, Engine& engine);
+void processInput(GLFWwindow* window);
 bool ENTER_PRESS = false;
 
 // 传递点光源函数
@@ -83,9 +82,6 @@ int main()
     // 绑定基本图元
     Draw draw;
 
-    // 引擎
-    Engine engine(&firework_list);
-
     //TODO：加载固定模型
 
     // 渲染循环
@@ -97,7 +93,7 @@ int main()
         lastFrame = currentFrame;
 
         // 接收输入
-        processInput(window, engine);
+        processInput(window);
 
         // 背景颜色
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -115,11 +111,12 @@ int main()
         ColorShader.setMat4("view", view);
 
         // 渲染烟花系统
-        for (int i = 0; i < firework_list.size(); i++)
-            draw.draw_firework(&firework_list[i], ColorShader);
-
         // 应用烟花引擎
-        engine.forward();
+        for (int i = 0; i < firework_list.size(); i++)
+        {
+            draw.draw_firework(&firework_list[i], ColorShader);
+            firework_list[i].move(0.1);
+        }
 
         //TODO：渲染固定模型
 
@@ -132,7 +129,7 @@ int main()
 }
 
 // 判断按键并执行相应动作
-void processInput(GLFWwindow* window, Engine& engine)
+void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -143,7 +140,10 @@ void processInput(GLFWwindow* window, Engine& engine)
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
         if (!ENTER_PRESS)
-            engine.create_firework_random(mudan_t);
+        {
+            Firework newfirework;
+            firework_list.push_back(newfirework);
+        }
         ENTER_PRESS = true;
     }
     if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
@@ -194,12 +194,12 @@ void set_point_light(Shader& blinnphongshader)
     string intensity_string = "].intensity";
     for (int i = 0; i < firework_list.size(); i++)
     {
-        if (firework_list[i].already_boom && firework_list[i].life_of_light > 0)
+        if (firework_list[i].isExploded() && firework_list[i].getLightLife() > 0)
         {
-            firework* ptr = &firework_list[i];
-            blinnphongshader.setVec3(struct_string + to_string(count) + color_string, ptr->light_color);
-            blinnphongshader.setVec3(struct_string + to_string(count) + pos_string, ptr->position[POSITION_NUMBER - 1]);
-            blinnphongshader.setFloat(struct_string + to_string(count) + intensity_string, ptr->light_intensity);
+            Firework* ptr = &firework_list[i];
+            blinnphongshader.setVec3(struct_string + to_string(count) + color_string, ptr->getLightColor());
+            blinnphongshader.setVec3(struct_string + to_string(count) + pos_string, ptr->getPosition());
+            blinnphongshader.setFloat(struct_string + to_string(count) + intensity_string, ptr->getLightIntensity());
             count++;
         }
     }
