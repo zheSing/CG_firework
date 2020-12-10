@@ -124,13 +124,18 @@ glm::vec3 Firework::xyz2rgb(glm::vec3 xyz)
     return rgb;
 }
 
-void Firework::move(float dt)
+void Firework::move(float noUse)
 {
     // if (framesUntilLaunch > 0)
     // {
     //     framesUntilLaunch--;
     //     return;
     // }
+
+    (void)noUse;	//233
+
+    float dt = glfwGetTime() - lastTime;
+    if (dt > 0.1f)	dt = 0.1f;
 
     if (this->isExploded())
     {
@@ -190,6 +195,7 @@ void Firework::move(float dt)
             std::cout << "Boom!" << std::endl;
         }
     }
+    lastTime = glfwGetTime();	//update last time
 }
 
 void Firework::explode(float dt)

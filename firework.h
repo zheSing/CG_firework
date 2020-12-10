@@ -33,6 +33,7 @@ public:
     glm::vec3 getLightColor();
 
 private:
+    GLfloat lastTime;
     GLboolean hasExploded;
     GLint position_cnt;                     //目前记录位置的数量，用于实现拖尾效果
     glm::vec3 position[POSITION_NUMBER];    //记录位置的数组，用于实现拖尾效果

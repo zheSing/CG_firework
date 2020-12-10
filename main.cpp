@@ -27,9 +27,9 @@ float FAR = 300.0f;
 bool firstMouse = true;
 
 // 时间
-float deltaTime = 0.0f;
+float deltaTime = 0.1f;
 float lastFrame = 0.0f;
-const float dt = 0.1f;
+const float dt = 3.0f;
 
 // 回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -116,7 +116,7 @@ int main()
         for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
         {
             draw.draw_firework(firework_it, ColorShader);
-            firework_it->move(dt);
+            firework_it->move(deltaTime * dt);
             // std::cout << firework_it->getPosition().x << ", " << firework_it->getPosition().y << ", " << firework_it->getPosition().z << endl;
             if (firework_it->isExploded() && firework_it->getParticleAliveNum() <= 0)
             {
