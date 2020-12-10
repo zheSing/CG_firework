@@ -43,6 +43,10 @@ polygon Particle::getShape()
     return shape;
 }
 
+void Particle::setPositionCnt(GLint position_cnt)
+{
+    this->position_cnt = position_cnt;
+}
 
 void Particle::setPosition(glm::vec3 position)
 {
@@ -65,6 +69,11 @@ void Particle::setColor(glm::vec4 color)
 void Particle::setRadius(GLfloat radius)
 {
     this->radius = radius;
+}
+
+void Particle::setShape(polygon shape)
+{
+    this->shape = shape;
 }
 
 const GLfloat Particle::GRAVITY = -0.01f;

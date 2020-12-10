@@ -3,11 +3,13 @@
 
 #include <GLFW/glfw3.h>
 #include <glm-master/glm/glm.hpp>
+#include <vector>
+using namespace std;
 
 #define POLYGON_NUM 2
 #define MAX_GRAIN_PER_FIREWORK 30
 #define MAX_FIREWORK_NUMBER 15
-#define POSITION_NUMBER 4
+#define POSITION_NUMBER 6
 
 enum polygon { sphere_t, cube_t };
 enum fireworktype { mudan_t };
@@ -32,8 +34,8 @@ public:
     void setShape(polygon);
     static const GLfloat GRAVITY;
 private:
-    GLint position_cnt;
-    glm::vec3 position[POSITION_NUMBER];
+    GLint position_cnt;                     //目前记录位置的数量，用于实现拖尾效果
+    glm::vec3 position[POSITION_NUMBER];    //记录位置的数组，用于实现拖尾效果
     glm::vec3 velocity;
     glm::vec4 color;
     GLfloat radius;

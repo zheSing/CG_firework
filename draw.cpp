@@ -34,8 +34,9 @@ Draw::~Draw()
 }
 
 // 渲染单个图元
-void Draw::draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec4 color, polygon type, Shader& myshader)
+void Draw::draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm::vec4 color, polygon type, Shader& myshader)
 {
+    glBindVertexArray(VAO[type]);
     for (int i = 0; i < pos_cnt; i++)
     {
         // 变换到中心，根据半径放缩比例
@@ -47,13 +48,12 @@ void Draw::draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec
         fadecolor.w /= (i + 1);
         myshader.setVec4("vertexColor", fadecolor);
         // 渲染
-        glBindVertexArray(VAO[type]);
         glDrawElements(GL_TRIANGLES, indices[type]->size(), GL_UNSIGNED_INT, 0);
     }
 }
 
 // 绘图。根据烟花参数渲染图形
-void Draw::draw_firework(Firework* fw, Shader& myshader)
+void Draw::draw_firework(vector<Firework>::iterator fw, Shader& myshader)
 {
     if (!fw->isExploded())
         draw_polygon(fw->getPositionArr(), fw->getPositionCnt(), fw->getRadius(), fw->getColor(), fw->getShape(), myshader);

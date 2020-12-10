@@ -1,9 +1,9 @@
+#include <glad/glad.h>
 #include "firework.h"
 #include "draw.h"
 #include "camera.h"
 #include "shader.h"
 #include <vector>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm-master/glm/glm.hpp>
 #include <glm-master/glm/gtc/matrix_transform.hpp>
@@ -12,8 +12,8 @@
 using namespace std;
 
 // 窗口大小
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1440;
+const unsigned int SCR_HEIGHT = 900;
 
 // 烟花列表
 vector<Firework> firework_list;
@@ -29,6 +29,7 @@ bool firstMouse = true;
 // 时间
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+const float dt = 0.1f;
 
 // 回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -101,7 +102,7 @@ int main()
 
         // 设置普通shaer
         ColorShader.use();
-        ColorShader.setVec3("viewPos", camera.Position);
+        // ColorShader.setVec3("viewPos", camera.Position);
 
         // 视角变换、投影变换
         // 世界变换交给draw_firework函数
@@ -112,10 +113,20 @@ int main()
 
         // 渲染烟花系统
         // 应用烟花引擎
-        for (int i = 0; i < firework_list.size(); i++)
+        for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
         {
-            draw.draw_firework(&firework_list[i], ColorShader);
-            firework_list[i].move(0.1);
+            draw.draw_firework(firework_it, ColorShader);
+            firework_it->move(dt);
+            // std::cout << firework_it->getPosition().x << ", " << firework_it->getPosition().y << ", " << firework_it->getPosition().z << endl;
+            if (firework_it->isExploded() && firework_it->getParticleAliveNum() <= 0)
+            {
+                firework_it = firework_list.erase(firework_it);
+                std::cout << "Delete a firework." << std::endl;
+            }
+            else
+            {
+                firework_it++;
+            }
         }
 
         //TODO：渲染固定模型

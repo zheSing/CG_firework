@@ -26,7 +26,7 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
     glm::vec3 position = glm::vec3(0.0f);
     float radius = 1.0f;
 
-    const int xymax = 10;
+    const int xymax = 5;
     const int maximum = xymax * xymax;
     for (int x = 0; x < xymax; x++)
         for (int y = 0; y < xymax; y++)

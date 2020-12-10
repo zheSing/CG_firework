@@ -3,44 +3,6 @@
 
 #include "particle.h"
 
-// struct grain
-// {
-//     int position_cnt;
-//     glm::vec3 position[POSITION_NUMBER];//位置
-//     glm::vec3 speed;//速度
-//     glm::vec4 color;//颜色
-
-//     float radius;//半径
-//     polygon shape;//形状
-// };
-
-
-// struct firework
-// {
-//     bool already_boom;//是否已经爆炸
-//     int life_before_boom;//爆炸前寿命
-//     int life_after_boom;//爆炸后寿命
-
-//     int position_cnt;
-//     glm::vec3 position[POSITION_NUMBER];//位置
-//     glm::vec3 speed;//方向
-
-//     glm::vec4 color;//颜色
-//     float radius;//半径
-//     polygon shape;//形状
-
-//     int life_of_light;//光源寿命
-//     float light_intensity;//光照强度
-//     glm::vec3 light_color;//光源颜色
-
-//     fireworktype boom_type;//爆炸方式
-
-//     int grain_cnt; //粒子数量
-
-//     grain grain_list[MAX_GRAIN_PER_FIREWORK];//粒子
-
-// };
-
 class Firework
 {
 public:
@@ -60,32 +22,36 @@ public:
     glm::vec4 getColor();
     GLfloat getRadius();
     GLint getParticleNum();
+    GLint getParticleAliveNum();
     Particle* getParticles();
 
     polygon getShape();
     fireworktype getType();
 
-    GLfloat getLightLife();      //光源寿命
-    GLfloat getLightIntensity();    //光照强度
-    glm::vec3 getLightColor();      //光源颜色
+    GLfloat getLightLife();
+    GLfloat getLightIntensity();
+    glm::vec3 getLightColor();
 
 private:
     GLboolean hasExploded;
-    GLint position_cnt;
-    glm::vec3 position[POSITION_NUMBER];
+    GLint position_cnt;                     //目前记录位置的数量，用于实现拖尾效果
+    glm::vec3 position[POSITION_NUMBER];    //记录位置的数组，用于实现拖尾效果
     glm::vec3 velocity;
     glm::vec4 color;
     GLfloat radius;
     polygon shape;
     fireworktype type;
     static const GLfloat GRAVITY;
+    static const GLfloat radiusScale;       //初始半径的缩放比例，用于适应世界范围
+    static const GLfloat velocityScale;     //初始速度的缩放比例，用于适应世界范围
+    static const GLfloat explodeScale;      //爆炸速度的缩放比例，用于适应世界范围
     static const GLint minParticleNum = 10;
-    static const GLint maxParticleNum = 20;
+    static const GLint maxParticleNum = 15;
     GLint particleNum;
     GLint particleAliveNum;
-    GLfloat light_life;      //光源寿命
-    GLfloat light_intensity;    //光照强度
-    glm::vec3 light_color;      //光源颜色
+    GLfloat light_life;                     //光源寿命
+    GLfloat light_intensity;                //光照强度
+    glm::vec3 light_color;                  //光源颜色
     Particle particles[maxParticleNum * maxParticleNum];
     glm::vec3 getSpherePoint(GLfloat, GLfloat);
     void velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3>& vertexes);

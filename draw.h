@@ -1,15 +1,14 @@
 #ifndef __DRAW_H__
 #define __DRAW_H__
 
+#include <glad/glad.h>
 #include "firework.h"
 #include "shader.h"
 #include <vector>
-#include <glad/glad.h>
 #include <glm-master/glm/glm.hpp>
 #include <glm-master/glm/gtc/matrix_transform.hpp>
 #include <iostream>
 using namespace std;
-
 
 void init_vertices();
 
@@ -20,8 +19,8 @@ private:
 public:
     Draw();
     ~Draw();
-    void draw_polygon(glm::vec3* position, int pos_cnt, float radius, glm::vec4 color, polygon type, Shader& myshader);
-    void draw_firework(Firework* fw, Shader& myshader);
+    void draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm::vec4 color, polygon type, Shader& myshader);
+    void draw_firework(vector<Firework>::iterator fw, Shader& myshader);
 };
 
 #endif

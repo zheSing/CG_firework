@@ -1,12 +1,15 @@
 #include "firework.h"
-#include "generate_vertices.h"
 #include <vector>
 #include <iostream>
 #include <algorithm>
 #include <glm-master/glm/glm.hpp>
 #include <glm-master/glm/gtc/matrix_transform.hpp>
 
-const GLfloat Firework::GRAVITY = -0.25f;
+// const GLfloat Firework::GRAVITY = -0.25f;
+const GLfloat Firework::GRAVITY = -9.8f;
+const GLfloat Firework::radiusScale = 250.0f;
+const GLfloat Firework::velocityScale = 80.0f;
+const GLfloat Firework::explodeScale = 80.0f;
 
 Firework::Firework()
 {
@@ -23,17 +26,20 @@ void Firework::initialise()
 
     hasExploded = false;
 
-    position[POSITION_NUMBER - 1] = glm::vec3(
-        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//��ʼλ��x����������[-0.1,0.1]
-        0.0f,//��ʼλ��y����
-        -0.99f	//��ʼλ��z����
-    );
+    position_cnt = 1;
+    // position[POSITION_NUMBER - 1] = glm::vec3(
+    //     -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//��ʼλ��x����������[-0.1,0.1]
+    //     0.0f,//��ʼλ��y����
+    //     -0.99f	//��ʼλ��z����
+    // );
+    position[POSITION_NUMBER - 1] = glm::vec3(0.0f);
 
     velocity = glm::vec3(
-        -0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52))),//��ʼ�ٶ�x����������[-0.26,0.26]
+        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//��ʼ�ٶ�x����������[-0.26,0.26]
         0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),	//��ʼ�ٶ�z����������[0.78,0.98]
-        -0.26 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.52)))//��ʼ�ٶ�y����������[-0.26,0.26]
+        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))//��ʼ�ٶ�y����������[-0.26,0.26]
     );
+    velocity *= Firework::velocityScale;
 
     glm::vec3 xyz(
         0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
@@ -47,8 +53,12 @@ void Firework::initialise()
     );
 
     radius = 0.006f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));//��ʼ�뾶������[0.004,0.005]
+    radius *= Firework::radiusScale;
+
     particleNum = 0;
     particleAliveNum = 0;
+    type = mudan_t;
+    shape = sphere_t;
 
     std::cout << "Initialised a firework." << std::endl;
 }
@@ -124,7 +134,6 @@ void Firework::move(float dt)
 
     if (this->isExploded())
     {
-
         this->explode(dt);
     }
 
@@ -151,10 +160,11 @@ void Firework::move(float dt)
             std::vector<glm::vec3> velSample;
             velocitySample(particleNum, particleNum, velSample);
 
-            GLfloat explosion_speed = 0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02)));//�ٶȴ�С�˻�����������[0.08,0.10]
+            GLfloat explosion_speed = Firework::explodeScale * (0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02))));//�ٶȴ�С�˻�����������[0.08,0.10]
 
             for (int i = 0; i < particleNum * particleNum; i++)
             {
+                particles[i].setPositionCnt(1);
                 particles[i].setPosition(this->getPosition());
                 particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//�����ٶȲ���, ʹ������ٶȲ�����ע�͵�����䲢ȡ��ע����һ�����
                 //particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//����ٶȲ���
@@ -171,8 +181,10 @@ void Firework::move(float dt)
                 ));
 
                 particles[i].setRadius(
-                    0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001)))//��ʼ�뾶������[0.002,0.003]
+                    Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))//��ʼ�뾶������[0.002,0.003]
                 );
+
+                particles[i].setShape(shape);
             }
 
             std::cout << "Boom!" << std::endl;
@@ -189,7 +201,7 @@ void Firework::explode(float dt)
             particles[i].setPosition(particles[i].getPosition() + (particles[i].getVelocity() * dt));
             particles[i].setVelocity(particles[i].getVelocity() + glm::vec3(0.0f, Particle::GRAVITY * dt, 0.0f));
 
-            float alphaFactor = 0.000005f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8)));
+            float alphaFactor = 0.000005f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.4)));
             particles[i].setColor(particles[i].getColor() - glm::vec4(0.0f, 0.0f, 0.0f, alphaFactor * dt));
             if (particles[i].getColor().a <= 0.0f)
             {
@@ -197,11 +209,6 @@ void Firework::explode(float dt)
             }
         }
     }
-
-    // if (particleAliveNum == 0)
-    // {
-    //     initialise();
-    // }
 }
 
 // GLboolean Firework::isLaunched()
@@ -255,6 +262,10 @@ GLint Firework::getParticleNum()
     return particleNum * particleNum;
 }
 
+GLint Firework::getParticleAliveNum()
+{
+    return particleAliveNum;
+}
 
 Particle* Firework::getParticles()
 {
