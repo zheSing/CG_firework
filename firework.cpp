@@ -151,6 +151,7 @@ void Firework::move(float dt)
         if (velocity.y + (Firework::GRAVITY * dt) <= 0.0f)
         {
             velocity.y = 0;
+            velocity *= 0.3;
             hasExploded = true;//z����߶ȴﵽ����ը
             color.a = 0.0f;//�����ը������ȫ͸��
             particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
@@ -175,10 +176,9 @@ void Firework::move(float dt)
                     0.0975274890661239624f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8590958118438720703f - 0.0975274890661239624f)))
                 );
 
-                particles[i].setColor(glm::vec4(
-                    xyz2rgb(xyz),
-                    1.0f	//��ʼ��͸��
-                ));
+                glm::vec4 particleColor = glm::vec4(xyz2rgb(xyz), 1.0f) * color;
+                particleColor.a = 1.0f;
+                particles[i].setColor(particleColor);
 
                 particles[i].setRadius(
                     Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))//��ʼ�뾶������[0.002,0.003]
