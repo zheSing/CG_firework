@@ -6,9 +6,9 @@
 class Firework
 {
 public:
-    Firework(); // Constructor declaration
+    Firework(fireworktype ftype); // Constructor declaration
     ~Firework();
-    void initialise();
+    void initialise(fireworktype ftype);
     void move(float);
     void explode(float);
     // GLboolean isLaunched();
@@ -47,7 +47,7 @@ private:
     static const GLfloat velocityScale;     //初始速度的缩放比例，用于适应世界范围
     static const GLfloat explodeScale;      //爆炸速度的缩放比例，用于适应世界范围
     static const GLint minParticleNum = 10;
-    static const GLint maxParticleNum = 15;
+    static const GLint maxParticleNum = 20;
     GLint particleNum;
     GLint particleAliveNum;
     GLfloat light_life;                     //光源寿命
@@ -59,6 +59,8 @@ private:
     glm::vec3 velocitySampleRandom();
     glm::vec3 rgb2xyz(glm::vec3);
     glm::vec3 xyz2rgb(glm::vec3);
+
+    void initialise_particles();            //其他爆炸类型
 };
 
 /*

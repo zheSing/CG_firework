@@ -42,10 +42,10 @@ void Draw::draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm:
         // 变换到中心，根据半径放缩比例
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, position[POSITION_NUMBER - 1 - i]);
-        model = glm::scale(model, glm::vec3(radius / (i + 1)));
+        model = glm::scale(model, glm::vec3(radius / (i + 1)*1.5));
         myshader.setMat4("model", model);
         glm::vec4 fadecolor = color;
-        fadecolor.w /= (i + 1);
+        fadecolor.w = fadecolor.w / (i + 1) * 1.5;
         myshader.setVec4("vertexColor", fadecolor);
         // 渲染
         glDrawElements(GL_TRIANGLES, indices[type]->size(), GL_UNSIGNED_INT, 0);

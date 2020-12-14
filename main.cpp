@@ -36,7 +36,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
-bool ENTER_PRESS = false;
+bool PRESS[] = { false,false,false,false };
 
 // 传递点光源函数
 void set_point_light(Shader& blinnphongshader);
@@ -148,17 +148,21 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    for (int i = 0; i < TYPE_NUM; i++)
     {
-        if (!ENTER_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_PRESS)
         {
-            Firework newfirework;
-            firework_list.push_back(newfirework);
+            if (!PRESS[i])
+            {
+                fireworktype type = fireworktype(i);
+                Firework newfirework(type);
+                firework_list.push_back(newfirework);
+            }
+            PRESS[i] = true;
         }
-        ENTER_PRESS = true;
+        if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_RELEASE)
+            PRESS[i] = false;
     }
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
-        ENTER_PRESS = false;
 }
 
 // 窗口回调函数
