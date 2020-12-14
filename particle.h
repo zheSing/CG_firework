@@ -2,7 +2,7 @@
 #define __PARTICLE_H__
 
 #include <GLFW/glfw3.h>
-#include <glm-master/glm/glm.hpp>
+#include <glm/glm.hpp>
 #include <vector>
 using namespace std;
 

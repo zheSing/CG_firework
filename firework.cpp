@@ -2,8 +2,8 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <glm-master/glm/glm.hpp>
-#include <glm-master/glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // const GLfloat Firework::GRAVITY = -0.25f;
 const GLfloat Firework::GRAVITY = -9.8f;

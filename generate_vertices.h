@@ -2,7 +2,7 @@
 #define __GENERATE_VERTICES_H__
 
 #include <vector>
-#include <glm-master/glm/glm.hpp>
+#include <glm/glm.hpp>
 #include <iostream>
 #include <fstream>
 #define M_PI 3.14159265358979323846

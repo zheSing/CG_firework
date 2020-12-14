@@ -5,9 +5,9 @@
 #include "shader.h"
 #include <vector>
 #include <GLFW/glfw3.h>
-#include <glm-master/glm/glm.hpp>
-#include <glm-master/glm/gtc/matrix_transform.hpp>
-#include <glm-master/glm/gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 using namespace std;
 

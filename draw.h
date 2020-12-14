@@ -5,8 +5,8 @@
 #include "firework.h"
 #include "shader.h"
 #include <vector>
-#include <glm-master/glm/glm.hpp>
-#include <glm-master/glm/gtc/matrix_transform.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 using namespace std;
 
