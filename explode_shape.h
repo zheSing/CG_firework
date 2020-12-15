@@ -209,5 +209,5 @@ float bullfinch_vertices[] = {
 0.000000,0.640104,-0.084241
 };
 
-float* vertices_arr[] = { nullptr,diamond_vertices,heart_vertices,bullfinch_vertices };
-int vertices_num[] = { 0,198 / 3,84 / 3,318 / 3 };
+float* vertices_arr[] = { nullptr, nullptr, diamond_vertices, heart_vertices, bullfinch_vertices };
+int vertices_num[] = { 0, 0, 198 / 3, 84 / 3, 318 / 3 };

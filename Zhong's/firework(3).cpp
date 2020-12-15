@@ -8,7 +8,7 @@
 
 // const GLfloat Firework::GRAVITY = -0.25f;
 const GLfloat Firework::GRAVITY = -9.8f;
-const GLfloat Firework::radiusScale = 250.0f;
+const GLfloat Firework::radiusScale = 70.0f;
 const GLfloat Firework::velocityScale = 80.0f;
 const GLfloat Firework::explodeScale = 80.0f;
 
@@ -161,14 +161,14 @@ void Firework::move(float noUse)
             hasExploded = true;//z����߶ȴﵽ����ը
             color.a = 0.0f;//�����ը������ȫ͸��
 
-            if (type == mudan_t || type == mudan_random_t)
+            if (type == mudan_t)
             {
                 particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
 
                 particleAliveNum = particleNum * particleNum;
 
-                std::vector<glm::vec3> velSample;
-                velocitySample(particleNum, particleNum, velSample);
+                //std::vector<glm::vec3> velSample;
+                //velocitySample(particleNum, particleNum, velSample);
 
                 GLfloat explosion_speed = Firework::explodeScale * (0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02))));//�ٶȴ�С�˻�����������[0.08,0.10]
 
@@ -176,10 +176,8 @@ void Firework::move(float noUse)
                 {
                     particles[i].setPositionCnt(1);
                     particles[i].setPosition(this->getPosition());
-                    if (type == mudan_t)
-                        particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//�����ٶȲ���, ʹ������ٶȲ�����ע�͵�����䲢ȡ��ע����һ�����
-                    else
-                        particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//����ٶȲ���
+                    //particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//�����ٶȲ���, ʹ������ٶȲ�����ע�͵�����䲢ȡ��ע����һ�����
+                    particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//����ٶȲ���
 
                     glm::vec3 xyz(
                         0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
@@ -212,7 +210,9 @@ void Firework::move(float noUse)
 
 void Firework::explode(float dt)
 {
-    int pNum = getParticleNum();
+    int pNum = particleNum;
+    if (type == mudan_t)
+        pNum *= particleNum;
     for (int i = 0; i < pNum; i++)
     {
         if (particles[i].getColor().a > 0.0f)
@@ -309,7 +309,7 @@ GLfloat Firework::getRadius()
 
 GLint Firework::getParticleNum()
 {
-    if (type == mudan_t || type == mudan_random_t)
+    if (type == mudan_t)
         return particleNum * particleNum;
     return particleNum;
 }

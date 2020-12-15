@@ -6,12 +6,13 @@
 #include "shading.h"
 #include <vector>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 #define STB_IMAGE_IMPLEMENTATION
+#include <glm-master/glm/glm.hpp>
+#include <glm-master/glm/gtc/matrix_transform.hpp>
+#include <glm-master/glm/gtc/type_ptr.hpp>
+#include <iostream>
 using namespace std;
+
 
 // 烟花列表
 vector<Firework> firework_list;
@@ -25,16 +26,16 @@ float FAR = 300.0f;
 bool firstMouse = true;
 
 // 时间
-float deltaTime = 0.1f;
+float deltaTime = 0.0f;
 float lastFrame = 0.0f;
-const float dt = 3.0f;
+const float dt = 0.1f;
 
 // 回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
-bool PRESS[TYPE_NUM] = { 0 };
+bool ENTER_PRESS = false;
 
 // 传递点光源函数
 void set_point_light(Shader& blinnphongshader);
@@ -45,7 +46,7 @@ int main()
     // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 创建窗口
@@ -71,7 +72,7 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
+    
     //帧缓冲
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
@@ -100,11 +101,8 @@ int main()
 
     // 开启深度测试
     glEnable(GL_DEPTH_TEST);
-
     // 绑定基本图元
     Draw draw;
-
-    //TODO：加载固定模型
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
@@ -122,8 +120,10 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 设置普通shaer
+
+        // 设置普通shader
         ColorShader.use();
+        // ColorShader.setVec3("viewPos", camera.Position);
 
         // 视角变换、投影变换
         // 世界变换交给draw_firework函数
@@ -137,8 +137,8 @@ int main()
         for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
         {
             draw.draw_firework(firework_it, ColorShader);
-            firework_it->move(deltaTime * dt);
-            // 判定是否爆炸及是否生存期到
+            firework_it->move(dt);
+            //判定是否爆炸及是否生存期到
             if (firework_it->isExploded() && firework_it->getParticleAliveNum() <= 0)
             {
                 firework_it = firework_list.erase(firework_it);
@@ -149,16 +149,13 @@ int main()
                 firework_it++;
             }
         }
-
-        BlurShading(BlurFBO, BlurColorbuffers, texColorBuffer[1], VAO, BlurShader);
+        BlurShading(BlurFBO,BlurColorbuffers,texColorBuffer[1],VAO,BlurShader);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         ResultShading(texColorBuffer[0], BlurColorbuffers[0], VAO, ResultShader);
-
-        //TODO：渲染固定模型
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -177,21 +174,17 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    for (int i = 0; i < TYPE_NUM; i++)
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
     {
-        if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_PRESS)
+        if (!ENTER_PRESS)
         {
-            if (!PRESS[i])
-            {
-                fireworktype type = fireworktype(i);
-                Firework newfirework(type);
-                firework_list.push_back(newfirework);
-            }
-            PRESS[i] = true;
+            Firework newfirework;
+            firework_list.push_back(newfirework);
         }
-        if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_RELEASE)
-            PRESS[i] = false;
+        ENTER_PRESS = true;
     }
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_RELEASE)
+        ENTER_PRESS = false;
 }
 
 // 窗口回调函数
@@ -227,7 +220,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
-
 // 传递点光源给着色器
 void set_point_light(Shader& blinnphongshader)
 {
