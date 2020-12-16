@@ -7,8 +7,8 @@
 using namespace std;
 
 #define POLYGON_NUM 2
-#define MAX_FIREWORK_NUMBER 15
-#define POSITION_NUMBER 6
+#define MAX_FIREWORK_NUMBER 20
+#define POSITION_NUMBER 4
 #define TYPE_NUM 5
 
 enum polygon { sphere_t, cube_t };

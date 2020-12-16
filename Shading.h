@@ -35,6 +35,41 @@ void init_rectangle(GLuint VAO, GLuint VBO, GLuint EBO)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glBindVertexArray(0);
 }
+
+void init_ground(GLuint VAO, GLuint VBO, GLuint EBO)
+{
+    float vertices[] = {
+        // positions            //normal            // texture coords
+         300.0f,  0.0f, 300.0f,      0.0f,1.0f,0.0f,     1.0f, 1.0f, // top right
+         300.0f,  0.0f,  -300.0f,    0.0f,1.0f,0.0f,     1.0f, 0.0f, // bottom right
+        -300.0f,  0.0f,  -300.0f,    0.0f,1.0f,0.0f,     0.0f, 0.0f, // bottom left
+        -300.0f,  0.0f,  300.0f,     0.0f,1.0f,0.0f,     0.0f, 1.0f  // top left 
+    };
+    //TODO：加载固定模型
+    unsigned int indices[] = {
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    // position attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    // normal attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    // texture coord attribute
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glBindVertexArray(0);
+}
+
 void init_framebuffer(GLuint framebuffer, GLuint* texColorBuffer)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
@@ -65,6 +100,7 @@ void init_framebuffer(GLuint framebuffer, GLuint* texColorBuffer)
     //绑定默认帧缓冲
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 void init_Blur(GLuint* BlurFBO, GLuint* BlurColorbuffers)
 {
     for (unsigned int i = 0; i < 2; i++)
@@ -82,6 +118,7 @@ void init_Blur(GLuint* BlurFBO, GLuint* BlurColorbuffers)
             std::cout << "Framebuffer not complete!" << std::endl;
     }
 }
+
 void BlurShading(GLuint* BlurFBO, GLuint* BlurColorbuffers, GLuint& input_texture, GLuint VAO, Shader& BlurShader)
 {
     bool horizontal = true, first_iteration = true;
@@ -102,6 +139,7 @@ void BlurShading(GLuint* BlurFBO, GLuint* BlurColorbuffers, GLuint& input_textur
         glBindVertexArray(0);
     }
 }
+
 void ResultShading(GLuint& tex1, GLuint& tex2, GLuint VAO, Shader& ResultShader)
 {
     ResultShader.use();

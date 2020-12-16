@@ -19,7 +19,7 @@ using namespace std;
 vector<Firework> firework_list;
 
 // 摄像机
-Camera camera(glm::vec3(0.0f, 125.0f, 110.0f));
+Camera camera(glm::vec3(0.0f, 130.0f, 110.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 float NEAR = 0.1f;
@@ -29,7 +29,7 @@ bool firstMouse = true;
 // 时间
 float deltaTime = 0.1f;
 float lastFrame = 0.0f;
-float dt = 1.5f;
+float dt = 2.0f;
 
 // 回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -50,7 +50,7 @@ int main()
     // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 创建窗口
@@ -99,11 +99,10 @@ int main()
     init_rectangle(VAO, VBO, EBO);
 
     Shader ColorShader("shader/Color.vs", "shader/Color.fs");
-    Shader BlinnPhongShader("shader/Blinn_Phong.vs", "shader/Blinn_Phong.fs");
     Shader BlurShader("shader/Result.vs", "shader/Blur.fs");
     Shader ResultShader("shader/Result.vs", "shader/Result.fs");
     Shader SkyboxShader("shader/Skybox.vs", "shader/Skybox.fs");
-    Shader CastleShader("shader/Model.vs", "shader/Model.fs");
+    Shader CastleShader("shader/Blinn_Phong.vs", "shader/Blinn_Phong.fs");
 
     // 开启深度测试
     glEnable(GL_DEPTH_TEST);
@@ -115,7 +114,7 @@ int main()
     Skybox skybox;
 
     // 加载固定模型
-    Model castle("Castle/Castle OBJ.obj");
+    Model castle("Castle/Castle OBJ2.obj");
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
@@ -170,6 +169,7 @@ int main()
         castleTransform = glm::scale(castleTransform, glm::vec3(5.0f));
         castleTransform = glm::rotate(castleTransform, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         CastleShader.setMat4("model", castleTransform);
+        set_point_light(CastleShader);
         castle.Draw(CastleShader);
 
         // Sky
@@ -187,7 +187,6 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ResultShading(texColorBuffer[0], BlurColorbuffers[0], VAO, ResultShader);
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -210,7 +209,7 @@ void processInput(GLFWwindow* window)
     {
         if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_PRESS)
         {
-            if (!PRESS[i])
+            if (!PRESS[i] && firework_list.size() < MAX_FIREWORK_NUMBER)
             {
                 fireworktype type = fireworktype(i);
                 Firework newfirework(type);
@@ -221,10 +220,10 @@ void processInput(GLFWwindow* window)
         if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_RELEASE)
             PRESS[i] = false;
     }
-    // if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-    //     dt = (dt + 0.01f) > 2.0f ? 2.0f : (dt + 0.01f);
-    // if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-    //     dt = (dt - 0.01f) < 1.0f ? 1.0f : (dt - 0.01f);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        dt = (dt + 0.01f) > 3.0f ? 3.0f : (dt + 0.01f);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        dt = (dt - 0.01f) < 1.0f ? 1.0f : (dt - 0.01f);
 }
 
 // 窗口回调函数
@@ -266,8 +265,8 @@ void set_point_light(Shader& blinnphongshader)
 {
     int count = 0;
     string struct_string = "light_list[";
-    string color_string = "].color";
-    string pos_string = "].pos";
+    string color_string = "].Color";
+    string pos_string = "].Position";
     string intensity_string = "].intensity";
     for (int i = 0; i < firework_list.size(); i++)
     {

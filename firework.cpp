@@ -161,6 +161,10 @@ void Firework::move(float noUse)
             hasExploded = true;//z����߶ȴﵽ����ը
             color.a = 0.0f;//�����ը������ȫ͸��
 
+            light_life = 1.0f;
+            light_color = glm::vec3(color.r, color.g, color.b);
+            light_intensity = 10000;
+
             if (type == mudan_t || type == mudan_random_t)
             {
                 particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
@@ -212,6 +216,7 @@ void Firework::move(float noUse)
 
 void Firework::explode(float dt)
 {
+    light_life -= dt;
     int pNum = getParticleNum();
     for (int i = 0; i < pNum; i++)
     {
