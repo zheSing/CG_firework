@@ -4,30 +4,32 @@
 #include "camera.h"
 #include "shader.h"
 #include "shading.h"
+#include "skybox.h"
+#include "model.h"
 #include <vector>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
-#define STB_IMAGE_IMPLEMENTATION
+#include <time.h>
 using namespace std;
 
 // 烟花列表
 vector<Firework> firework_list;
 
 // 摄像机
-Camera camera(glm::vec3(0.0f, 150.0f, 225.0f));
+Camera camera(glm::vec3(0.0f, 125.0f, 110.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 float NEAR = 0.1f;
-float FAR = 300.0f;
+float FAR = 400.0f;
 bool firstMouse = true;
 
 // 时间
 float deltaTime = 0.1f;
 float lastFrame = 0.0f;
-const float dt = 3.0f;
+float dt = 1.5f;
 
 // 回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -41,6 +43,9 @@ void set_point_light(Shader& blinnphongshader);
 
 int main()
 {
+    // 设置随机数种子
+    srand(unsigned int(time(NULL)));
+
     // 初始化glfw设置
     // ------------------------------
     glfwInit();
@@ -93,10 +98,12 @@ int main()
     glGenBuffers(1, &EBO);
     init_rectangle(VAO, VBO, EBO);
 
-    Shader ColorShader("Color.vs", "Color.fs");
-    Shader BlinnPhongShader("Blinn_Phong.vs", "Blinn_Phong.fs");
-    Shader BlurShader("Result.vs", "Blur.fs");
-    Shader ResultShader("Result.vs", "Result.fs");
+    Shader ColorShader("shader/Color.vs", "shader/Color.fs");
+    Shader BlinnPhongShader("shader/Blinn_Phong.vs", "shader/Blinn_Phong.fs");
+    Shader BlurShader("shader/Result.vs", "shader/Blur.fs");
+    Shader ResultShader("shader/Result.vs", "shader/Result.fs");
+    Shader SkyboxShader("shader/Skybox.vs", "shader/Skybox.fs");
+    Shader CastleShader("shader/Model.vs", "shader/Model.fs");
 
     // 开启深度测试
     glEnable(GL_DEPTH_TEST);
@@ -104,7 +111,11 @@ int main()
     // 绑定基本图元
     Draw draw;
 
-    //TODO：加载固定模型
+    // 绑定天空盒
+    Skybox skybox;
+
+    // 加载固定模型
+    Model castle("Castle/Castle OBJ.obj");
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
@@ -127,17 +138,17 @@ int main()
 
         // 视角变换、投影变换
         // 世界变换交给draw_firework函数
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, NEAR, FAR);
         glm::mat4 view = camera.GetViewMatrix();
-        ColorShader.setMat4("projection", projection);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, NEAR, FAR);
         ColorShader.setMat4("view", view);
+        ColorShader.setMat4("projection", projection);
 
         // 渲染烟花系统
         // 应用烟花引擎
         for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
         {
             draw.draw_firework(firework_it, ColorShader);
-            firework_it->move(deltaTime * dt);
+            firework_it->move(dt);
             // 判定是否爆炸及是否生存期到
             if (firework_it->isExploded() && firework_it->getParticleAliveNum() <= 0)
             {
@@ -150,6 +161,25 @@ int main()
             }
         }
 
+        // 渲染固定模型
+        CastleShader.use();
+        CastleShader.setMat4("view", view);
+        CastleShader.setMat4("projection", projection);
+        glm::mat4 castleTransform = glm::mat4(1.0f);
+        // castleTransform = glm::translate(castleTransform, glm::vec3(0.0f, 0.0f, 0.0f));
+        castleTransform = glm::scale(castleTransform, glm::vec3(5.0f));
+        castleTransform = glm::rotate(castleTransform, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        CastleShader.setMat4("model", castleTransform);
+        castle.Draw(CastleShader);
+
+        // Sky
+        SkyboxShader.use();
+        SkyboxShader.setInt("skybox", 0);
+        SkyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
+        SkyboxShader.setMat4("projection", projection);
+        skybox.Draw();
+
+        // Blur
         BlurShading(BlurFBO, BlurColorbuffers, texColorBuffer[1], VAO, BlurShader);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -158,7 +188,6 @@ int main()
 
         ResultShading(texColorBuffer[0], BlurColorbuffers[0], VAO, ResultShader);
 
-        //TODO：渲染固定模型
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -173,10 +202,10 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(LEFT, deltaTime);
+    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    //     camera.ProcessKeyboard(RIGHT, deltaTime);
     for (int i = 0; i < TYPE_NUM; i++)
     {
         if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_PRESS)
@@ -192,6 +221,10 @@ void processInput(GLFWwindow* window)
         if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_RELEASE)
             PRESS[i] = false;
     }
+    // if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    //     dt = (dt + 0.01f) > 2.0f ? 2.0f : (dt + 0.01f);
+    // if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    //     dt = (dt - 0.01f) < 1.0f ? 1.0f : (dt - 0.01f);
 }
 
 // 窗口回调函数

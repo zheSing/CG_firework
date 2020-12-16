@@ -33,10 +33,10 @@ void Firework::initialise(fireworktype ftype)
     //     0.0f,//��ʼλ��y����
     //     -0.99f	//��ʼλ��z����
     // );
-    position[POSITION_NUMBER - 1] = glm::vec3(0.0f);
+    position[POSITION_NUMBER - 1] = glm::vec3(0.0f, 45.0f, -110.0f);
 
     velocity = glm::vec3(
-        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//��ʼ�ٶ�x����������[-0.26,0.26]
+        -0.3 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.6))),//��ʼ�ٶ�x����������[-0.26,0.26]
         0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),	//��ʼ�ٶ�z����������[0.78,0.98]
         -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))//��ʼ�ٶ�y����������[-0.26,0.26]
     );
@@ -53,7 +53,7 @@ void Firework::initialise(fireworktype ftype)
         1.0f	//��ʼ��͸��
     );
 
-    radius = 0.006f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));//��ʼ�뾶������[0.004,0.005]
+    radius = 0.003f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));//��ʼ�뾶������[0.004,0.005]
     radius *= Firework::radiusScale;
 
     particleNum = 0;
@@ -133,10 +133,10 @@ void Firework::move(float noUse)
     //     return;
     // }
 
-    (void)noUse;	//233
-
     float dt = glfwGetTime() - lastTime;
     if (dt > 0.1f)	dt = 0.1f;
+
+    dt *= noUse;
 
     if (this->isExploded())
     {

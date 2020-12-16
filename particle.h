@@ -12,7 +12,7 @@ using namespace std;
 #define TYPE_NUM 5
 
 enum polygon { sphere_t, cube_t };
-enum fireworktype { mudan_t, mudan_random_t, diamond_t, heart_t, bullfinch_t };
+enum fireworktype { mudan_t, mudan_random_t, diamond_t, heart_t, bird_t };
 
 class Particle
 {

@@ -76,4 +76,4 @@ void Particle::setShape(polygon shape)
     this->shape = shape;
 }
 
-const GLfloat Particle::GRAVITY = -0.01f;
+const GLfloat Particle::GRAVITY = -2.5f;
