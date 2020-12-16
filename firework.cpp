@@ -161,9 +161,9 @@ void Firework::move(float noUse)
             hasExploded = true;//z����߶ȴﵽ����ը
             color.a = 0.0f;//�����ը������ȫ͸��
 
-            light_life = 1.0f;
+            light_life = 2.0f;
             light_color = glm::vec3(color.r, color.g, color.b);
-            light_intensity = 10000;
+            light_intensity = 15000;
 
             if (type == mudan_t || type == mudan_random_t)
             {

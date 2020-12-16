@@ -21,7 +21,7 @@ uniform vec3 viewPos;
 
 void main()
 {
-    vec4 colorv4 = texture(texture_diffuse1, vs_out.TexCoords) * vec4(0.3, 0.3, 0.3, 1.0);
+    vec4 colorv4 = texture(texture_diffuse1, vs_out.TexCoords);
     vec3 color = vec3(colorv4);
     // vec3 color = vec3(0.0,0.0,0.0);
 
@@ -51,7 +51,7 @@ void main()
         lighting += result;
     }
 
-    vec3 result=lighting+color;
+    vec3 result=lighting+color*0.2;
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0)
         BrightColor = vec4(result, 1.0);

@@ -46,7 +46,7 @@ private:
     static const GLfloat radiusScale;       //初始半径的缩放比例，用于适应世界范围
     static const GLfloat velocityScale;     //初始速度的缩放比例，用于适应世界范围
     static const GLfloat explodeScale;      //爆炸速度的缩放比例，用于适应世界范围
-    static const GLint minParticleNum = 10;
+    static const GLint minParticleNum = 15;
     static const GLint maxParticleNum = 20;
     GLint particleNum;
     GLint particleAliveNum;
