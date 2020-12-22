@@ -3,7 +3,7 @@
 #include "draw.h"
 #include "camera.h"
 #include "shader.h"
-#include "shading.h"
+#include "blur.h"
 #include "skybox.h"
 #include "model.h"
 #include <vector>
@@ -26,15 +26,20 @@ float NEAR = 0.1f;
 float FAR = 400.0f;
 bool firstMouse = true;
 
+// 时间
+float deltaTime = 0.1f;
+float lastFrame = 0.0f;
+
 // 烟花速度
 float dt = 2.0f;
 
 // 回调函数
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);  // 调整窗口大小
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);          // 鼠标移动
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);   // 鼠标缩放
 void processInput(GLFWwindow* window);                                      // 按键
-bool PRESS[TYPE_NUM] = { 0 };                                               // 按键属性，当前是否被按下
+bool PRESS[TYPE_NUM] = { 0 };                                               // 按键状态，当前是否被按下
+bool MOUSEPRESS = false;                                                    // 鼠标左键状态
+bool MOUSEABLE = false;                                                     // 鼠标状态
 
 // 传递点光源给着色器
 void set_point_light(Shader& blinnphongshader);
@@ -50,6 +55,13 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+    // 获取设备信息
+    GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(pMonitor);
+    SCR_WIDTH = mode->width / 1.5;
+    SCR_HEIGHT = mode->height / 1.5;
 
     // 创建窗口
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FIREWORK", NULL, NULL);
@@ -60,7 +72,6 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
 
@@ -74,29 +85,6 @@ int main()
         return -1;
     }
 
-    // 帧缓冲
-    GLuint framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-
-    // 颜色缓冲区
-    GLuint texColorBuffer[2];
-    glGenTextures(2, texColorBuffer);
-    init_framebuffer(framebuffer, texColorBuffer);
-
-    // Blur效果
-    GLuint BlurFBO[2];
-    GLuint BlurColorbuffers[2];
-    glGenFramebuffers(2, BlurFBO);
-    glGenTextures(2, BlurColorbuffers);
-    init_Blur(BlurFBO, BlurColorbuffers);
-
-    // 帧矩形顶点
-    GLuint VAO, VBO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    init_rectangle(VAO, VBO, EBO);
-
     // 加载着色器
     Shader ColorShader("shader/Color.vs", "shader/Color.fs");
     Shader BlurShader("shader/Result.vs", "shader/Blur.fs");
@@ -106,6 +94,9 @@ int main()
 
     // 开启深度测试
     glEnable(GL_DEPTH_TEST);
+
+    // 辉光效果初始化
+    Blur blur;
 
     // 绑定烟花图元
     Draw draw;
@@ -119,13 +110,16 @@ int main()
     // 渲染循环
     while (!glfwWindowShouldClose(window))
     {
+        // 每帧时间
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         // 接收输入
         processInput(window);
 
         // 背景颜色
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        blur.bindFrameBuffer();
 
         // 设置烟花着色器
         ColorShader.use();
@@ -140,7 +134,7 @@ int main()
         for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
         {
             draw.draw_firework(firework_it, ColorShader);
-            firework_it->move(dt);
+            firework_it->move(dt * deltaTime);
             // 判定是否爆炸及是否生存期到
             if (firework_it->isExploded() && firework_it->getParticleAliveNum() <= 0)
             {
@@ -153,7 +147,7 @@ int main()
             }
         }
 
-        // 设置烟花着色器
+        // 设置城堡着色器
         CastleShader.use();
         // MVP变换
         CastleShader.setMat4("view", view);
@@ -177,11 +171,7 @@ int main()
         skybox.Draw();
 
         // 后处理：辉光效果
-        BlurShading(BlurFBO, BlurColorbuffers, texColorBuffer[1], VAO, BlurShader);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        ResultShading(texColorBuffer[0], BlurColorbuffers[0], VAO, ResultShader);
+        blur.blurTheFrame(BlurShader, ResultShader);
 
         // 显示渲染结果
         glfwSwapBuffers(window);
@@ -222,14 +212,26 @@ void processInput(GLFWwindow* window)
         dt = (dt + 0.01f) > 3.0f ? 3.0f : (dt + 0.01f);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         dt = (dt - 0.01f) < 1.0f ? 1.0f : (dt - 0.01f);
-}
-
-// 窗口回调函数
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-    SCR_WIDTH = width;
-    SCR_HEIGHT = height;
+    // 鼠标点击
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && MOUSEPRESS == false)
+    {
+        if (MOUSEABLE)
+        {
+            glfwSetCursorPosCallback(window, mouse_callback);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            MOUSEABLE = false;
+        }
+        else
+        {
+            firstMouse = true;
+            glfwSetCursorPosCallback(window, NULL);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            MOUSEABLE = true;
+        }
+        MOUSEPRESS = true;
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+        MOUSEPRESS = false;
 }
 
 

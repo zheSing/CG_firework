@@ -91,7 +91,7 @@ Skybox::Skybox()
 Skybox::~Skybox()
 {
     glDeleteVertexArrays(1, &skyboxVAO);
-    glDeleteBuffers(1, &skyboxVAO);
+    glDeleteBuffers(1, &skyboxVBO);
 }
 
 void Skybox::Draw()

@@ -30,7 +30,6 @@ public:
     glm::vec3 getLightColor();
 
 private:
-    GLfloat lastTime;                                           // 上一次渲染用时
     GLboolean hasExploded;                                      // 是否已经爆炸
     GLint position_cnt;                                         // 目前记录位置的数量，用于实现拖尾效果
     glm::vec3 position[POSITION_NUMBER];                        // 记录位置的数组，用于实现拖尾效果

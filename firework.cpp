@@ -63,13 +63,8 @@ void Firework::initialise(fireworktype ftype)
 }
 
 
-void Firework::move(float scale)
+void Firework::move(float dt)
 {
-    float dt = glfwGetTime() - lastTime;
-    if (dt > 0.1f)	dt = 0.1f;
-
-    dt *= scale;
-
     if (this->isExploded())
     {
         this->explode(dt);
@@ -148,7 +143,6 @@ void Firework::move(float scale)
             std::cout << "Boom!" << std::endl;
         }
     }
-    lastTime = glfwGetTime();	//update last time
 }
 
 void Firework::explode(float dt)
