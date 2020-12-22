@@ -2,8 +2,9 @@
 #define __SHADING_H__
 
 // 窗口大小
-const unsigned int SCR_WIDTH = 1440;
-const unsigned int SCR_HEIGHT = 900;
+unsigned int SCR_WIDTH = 1440;
+unsigned int SCR_HEIGHT = 900;
+
 // 将帧缓冲渲染到屏幕上的矩形初始化
 void init_rectangle(GLuint VAO, GLuint VBO, GLuint EBO)
 {
@@ -14,7 +15,6 @@ void init_rectangle(GLuint VAO, GLuint VBO, GLuint EBO)
         -1.0f, -1.0f,    0.0f, 0.0f, // bottom left
         -1.0f,  1.0f,    0.0f, 1.0f  // top left 
     };
-    //TODO：加载固定模型
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle

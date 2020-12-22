@@ -7,9 +7,8 @@
 #include "shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 
-
+// 天空盒顶点
 float skyboxVertices[] = {
-    // positions
     -1.0f,  1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
      1.0f, -1.0f, -1.0f,
@@ -53,22 +52,22 @@ float skyboxVertices[] = {
      1.0f, -1.0f,  1.0f
 };
 
+
 class Skybox
 {
 private:
     unsigned int skyboxVAO, skyboxVBO;
     unsigned int cubemapTexture;
-    unsigned int loadTexture(char const* path);
-    unsigned int loadCubemap(std::vector<std::string> faces);
+    unsigned int loadCubemap(std::vector<std::string> faces);   // 根据路径加载天空盒纹理图片
 public:
-    Skybox();
-    ~Skybox();
-    void Draw();
+    Skybox();       // 初始化：绑定VAO，加载纹理图片
+    ~Skybox();      // 销毁：释放缓存
+    void Draw();    // 渲染天空盒
 };
+
 
 Skybox::Skybox()
 {
-    // skybox VAO
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
     glBindVertexArray(skyboxVAO);
@@ -76,7 +75,6 @@ Skybox::Skybox()
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
     std::vector<std::string> faces
     {
         ("skybox/right.jpg"),
@@ -89,6 +87,7 @@ Skybox::Skybox()
     cubemapTexture = loadCubemap(faces);
 }
 
+
 Skybox::~Skybox()
 {
     glDeleteVertexArrays(1, &skyboxVAO);
@@ -98,65 +97,19 @@ Skybox::~Skybox()
 void Skybox::Draw()
 {
     stbi_set_flip_vertically_on_load(true);
-    glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-    // skybox cube
+    // 改变深度测试函数，使等于1的深度能通过测试
+    glDepthFunc(GL_LEQUAL);
+    // 绘制
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-    glDepthFunc(GL_LESS); // set depth function back to default
+    // 还原深度测试函数
+    glDepthFunc(GL_LESS);
 }
 
 
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-unsigned int Skybox::loadTexture(char const* path)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char* data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
-}
-
-// loads a cubemap texture from 6 individual texture faces
-// order:
-// +X (right)
-// -X (left)
-// +Y (top)
-// -Y (bottom)
-// +Z (front)
-// -Z (back)
-// -------------------------------------------------------
 unsigned int Skybox::loadCubemap(std::vector<std::string> faces)
 {
     unsigned int textureID;

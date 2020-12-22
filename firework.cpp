@@ -23,120 +23,52 @@ Firework::~Firework()
 
 void Firework::initialise(fireworktype ftype)
 {
-    // framesUntilLaunch = ((int)rand() % 2000);
-
+    type = ftype;
+    shape = sphere_t;
     hasExploded = false;
 
+    // 初始位置 0.0f, 45.0f, -110.0f
     position_cnt = 1;
-    // position[POSITION_NUMBER - 1] = glm::vec3(
-    //     -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),//��ʼλ��x����������[-0.1,0.1]
-    //     0.0f,//��ʼλ��y����
-    //     -0.99f	//��ʼλ��z����
-    // );
     position[POSITION_NUMBER - 1] = glm::vec3(0.0f, 45.0f, -110.0f);
 
+    // 随机初始速度
     velocity = glm::vec3(
-        -0.3 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.6))),//��ʼ�ٶ�x����������[-0.26,0.26]
-        0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),	//��ʼ�ٶ�z����������[0.78,0.98]
-        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))//��ʼ�ٶ�y����������[-0.26,0.26]
+        // x轴方向限制在 [-0.3,0.3] * velocityScale
+        -0.3 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.6))),
+        // y轴方向限制在 [0.78,0.98] * velocityScale
+        0.78 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),
+        // z轴方向限制在 [-0.1,0.1] * velocityScale
+        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))
     );
     velocity *= Firework::velocityScale;
 
+    // 半径限制在 [0.003,0.004] * radiusScale
+    radius = 0.003f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));
+    radius *= Firework::radiusScale;
+    particleNum = 0;
+    particleAliveNum = 0;
+
+    // 生成一定范围内的随机颜色
     glm::vec3 xyz(
         0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
         0.218611598014831543f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.7708090543746948242f - 0.218611598014831543f))),
         0.0975274890661239624f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8590958118438720703f - 0.0975274890661239624f)))
     );
-
     color = glm::vec4(
         xyz2rgb(xyz),
-        1.0f	//��ʼ��͸��
+        1.0f
     );
-
-    radius = 0.003f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001f)));//��ʼ�뾶������[0.004,0.005]
-    radius *= Firework::radiusScale;
-
-    particleNum = 0;
-    particleAliveNum = 0;
-    type = ftype;
-    shape = sphere_t;
 
     std::cout << "Initialised a firework." << std::endl;
 }
 
-glm::vec3 Firework::getSpherePoint(GLfloat u, GLfloat v)
+
+void Firework::move(float scale)
 {
-    GLfloat pi = glm::pi<GLfloat>();
-    GLfloat z = std::cos(pi * u);
-    GLfloat x = std::sin(pi * u) * std::cos(2 * pi * v);
-    GLfloat y = std::sin(pi * u) * std::sin(2 * pi * v);
-    return glm::vec3(x, y, z);
-}
-
-
-void Firework::velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3>& vertexes)
-{
-    // Longitude�������зָ���
-    // Latitude��γ���зָ���
-    GLfloat lon_step = 1.0f / Longitude;
-    GLfloat lat_step = 1.0f / Latitude;
-    for (size_t lat = 0; lat < Latitude; lat++) {  // γ��u
-        for (size_t lon = 0; lon < Longitude; lon++) { // ����v
-            glm::vec3 point = getSpherePoint(lat * lat_step, lon * lon_step);
-            vertexes.push_back(point);
-        }
-    }
-}
-
-glm::vec3 Firework::velocitySampleRandom()
-{
-    return glm::normalize(glm::vec3(
-        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),
-        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),
-        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))
-    ));
-}
-
-glm::vec3 Firework::rgb2xyz(glm::vec3 rgb)
-{
-    rgb.r > 0.04045f ? rgb.r = pow(((rgb.r + 0.055f) / 1.055f), 2.4f) : rgb.r /= 12.92f;
-    rgb.g > 0.04045f ? rgb.g = pow(((rgb.g + 0.055f) / 1.055f), 2.4f) : rgb.g /= 12.92f;
-    rgb.b > 0.04045f ? rgb.b = pow(((rgb.b + 0.055f) / 1.055f), 2.4f) : rgb.b /= 12.92f;
-
-    glm::mat3 A(glm::vec3(0.412456439089692, 0.212672851405623, 0.019333895582329),
-        glm::vec3(0.357576077643909, 0.715152155287818, 0.119192025881303),
-        glm::vec3(0.180437483266399, 0.072174993306560, 0.950304078536368));
-
-    return A * rgb;
-}
-
-glm::vec3 Firework::xyz2rgb(glm::vec3 xyz)
-{
-    glm::mat3 A(glm::vec3(3.240454162114104, -0.969266030505187, 0.055643430959115),
-        glm::vec3(-1.537138512797716, 1.876010845446694, -0.204025913516754),
-        glm::vec3(-0.498531409556016, 0.041556017530350, 1.057225188223179));
-
-    glm::vec3 rgb = A * xyz;
-
-    rgb.r > 0.0031308f ? rgb.r = 1.055f * pow(rgb.r, (1.0f / 2.4f)) - 0.055f : rgb.r *= 12.92f;
-    rgb.g > 0.0031308f ? rgb.g = 1.055f * pow(rgb.g, (1.0f / 2.4f)) - 0.055f : rgb.g *= 12.92f;
-    rgb.b > 0.0031308f ? rgb.b = 1.055f * pow(rgb.b, (1.0f / 2.4f)) - 0.055f : rgb.b *= 12.92f;
-
-    return rgb;
-}
-
-void Firework::move(float noUse)
-{
-    // if (framesUntilLaunch > 0)
-    // {
-    //     framesUntilLaunch--;
-    //     return;
-    // }
-
     float dt = glfwGetTime() - lastTime;
     if (dt > 0.1f)	dt = 0.1f;
 
-    dt *= noUse;
+    dt *= scale;
 
     if (this->isExploded())
     {
@@ -145,6 +77,7 @@ void Firework::move(float noUse)
 
     else
     {
+        // 更新位置
         position_cnt = position_cnt + 1 < POSITION_NUMBER ? position_cnt + 1 : POSITION_NUMBER;
         for (int i = 0; i < POSITION_NUMBER - 1; i++)
         {
@@ -152,19 +85,22 @@ void Firework::move(float noUse)
         }
         position[POSITION_NUMBER - 1] += (velocity * dt);
 
+        // 更新速度
         velocity.y += (Firework::GRAVITY * dt);
 
+        // y方向速度为0时爆炸
         if (velocity.y + (Firework::GRAVITY * dt) <= 0.0f)
         {
             velocity.y = 0;
             velocity *= 0.3;
-            hasExploded = true;//z����߶ȴﵽ����ը
-            color.a = 0.0f;//�����ը������ȫ͸��
+            hasExploded = true;
+            color.a = 0.0f;
 
             light_life = 2.0f;
             light_color = glm::vec3(color.r, color.g, color.b);
             light_intensity = 15000;
 
+            // 球形烟花或随机球形烟花爆炸
             if (type == mudan_t || type == mudan_random_t)
             {
                 particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
@@ -172,42 +108,43 @@ void Firework::move(float noUse)
                 particleAliveNum = particleNum * particleNum;
 
                 std::vector<glm::vec3> velSample;
-                velocitySample(particleNum, particleNum, velSample);
+                if (type == mudan_t)
+                    velocitySample(particleNum, particleNum, velSample);
 
-                GLfloat explosion_speed = Firework::explodeScale * (0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02))));//�ٶȴ�С�˻�����������[0.08,0.10]
+                // 爆炸速度限制在 [0.1,0.12] * explodeScale
+                GLfloat explosion_speed = Firework::explodeScale * (0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02))));
 
                 for (int i = 0; i < particleNum * particleNum; i++)
                 {
                     particles[i].setPositionCnt(1);
                     particles[i].setPosition(this->getPosition());
                     if (type == mudan_t)
-                        particles[i].setVelocity(velSample[i] * explosion_speed + velocity);//�����ٶȲ���, ʹ������ٶȲ�����ע�͵�����䲢ȡ��ע����һ�����
+                        particles[i].setVelocity(velSample[i] * explosion_speed + velocity);
                     else
-                        particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);//����ٶȲ���
+                        particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);
 
                     glm::vec3 xyz(
                         0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
                         0.218611598014831543f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.7708090543746948242f - 0.218611598014831543f))),
                         0.0975274890661239624f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8590958118438720703f - 0.0975274890661239624f)))
                     );
-
                     glm::vec4 particleColor = glm::vec4(xyz2rgb(xyz), 1.0f) * color;
                     particleColor.a = 1.0f;
                     particles[i].setColor(particleColor);
 
+                    // 粒子半径限制在 [0.002,0.003] * radiusScale
                     particles[i].setRadius(
-                        Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))//��ʼ�뾶������[0.002,0.003]
+                        Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))
                     );
 
                     particles[i].setShape(shape);
                 }
             }
-
+            // 其他类型烟花爆炸
             else
             {
                 initialise_particles();
             }
-
             std::cout << "Boom!" << std::endl;
         }
     }
@@ -217,6 +154,7 @@ void Firework::move(float noUse)
 void Firework::explode(float dt)
 {
     light_life -= dt;
+    light_intensity -= 1500 * dt;
     int pNum = getParticleNum();
     for (int i = 0; i < pNum; i++)
     {
@@ -266,15 +204,65 @@ void Firework::initialise_particles()
     }
 }
 
-// GLboolean Firework::isLaunched()
-// {
-//     return framesUntilLaunch <= 0;
-// }
+glm::vec3 Firework::getSpherePoint(GLfloat u, GLfloat v)
+{
+    GLfloat pi = glm::pi<GLfloat>();
+    GLfloat z = std::cos(pi * u);
+    GLfloat x = std::sin(pi * u) * std::cos(2 * pi * v);
+    GLfloat y = std::sin(pi * u) * std::sin(2 * pi * v);
+    return glm::vec3(x, y, z);
+}
 
-// void Firework::updateFramesUntilLaunch()
-// {
-//     framesUntilLaunch--;
-// }
+
+void Firework::velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3>& vertexes)
+{
+    GLfloat lon_step = 1.0f / Longitude;
+    GLfloat lat_step = 1.0f / Latitude;
+    for (size_t lat = 0; lat < Latitude; lat++) {
+        for (size_t lon = 0; lon < Longitude; lon++) {
+            glm::vec3 point = getSpherePoint(lat * lat_step, lon * lon_step);
+            vertexes.push_back(point);
+        }
+    }
+}
+
+glm::vec3 Firework::velocitySampleRandom()
+{
+    return glm::normalize(glm::vec3(
+        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),
+        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2))),
+        -0.1 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.2)))
+    ));
+}
+
+glm::vec3 Firework::rgb2xyz(glm::vec3 rgb)
+{
+    rgb.r > 0.04045f ? rgb.r = pow(((rgb.r + 0.055f) / 1.055f), 2.4f) : rgb.r /= 12.92f;
+    rgb.g > 0.04045f ? rgb.g = pow(((rgb.g + 0.055f) / 1.055f), 2.4f) : rgb.g /= 12.92f;
+    rgb.b > 0.04045f ? rgb.b = pow(((rgb.b + 0.055f) / 1.055f), 2.4f) : rgb.b /= 12.92f;
+
+    glm::mat3 A(glm::vec3(0.412456439089692, 0.212672851405623, 0.019333895582329),
+        glm::vec3(0.357576077643909, 0.715152155287818, 0.119192025881303),
+        glm::vec3(0.180437483266399, 0.072174993306560, 0.950304078536368));
+
+    return A * rgb;
+}
+
+glm::vec3 Firework::xyz2rgb(glm::vec3 xyz)
+{
+    glm::mat3 A(glm::vec3(3.240454162114104, -0.969266030505187, 0.055643430959115),
+        glm::vec3(-1.537138512797716, 1.876010845446694, -0.204025913516754),
+        glm::vec3(-0.498531409556016, 0.041556017530350, 1.057225188223179));
+
+    glm::vec3 rgb = A * xyz;
+
+    rgb.r > 0.0031308f ? rgb.r = 1.055f * pow(rgb.r, (1.0f / 2.4f)) - 0.055f : rgb.r *= 12.92f;
+    rgb.g > 0.0031308f ? rgb.g = 1.055f * pow(rgb.g, (1.0f / 2.4f)) - 0.055f : rgb.g *= 12.92f;
+    rgb.b > 0.0031308f ? rgb.b = 1.055f * pow(rgb.b, (1.0f / 2.4f)) - 0.055f : rgb.b *= 12.92f;
+
+    return rgb;
+}
+
 
 GLboolean Firework::isExploded()
 {

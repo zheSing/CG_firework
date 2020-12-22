@@ -26,19 +26,17 @@ float NEAR = 0.1f;
 float FAR = 400.0f;
 bool firstMouse = true;
 
-// 时间
-float deltaTime = 0.1f;
-float lastFrame = 0.0f;
+// 烟花速度
 float dt = 2.0f;
 
 // 回调函数
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window);
-bool PRESS[TYPE_NUM] = { 0 };
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);  // 调整窗口大小
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);          // 鼠标移动
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);   // 鼠标缩放
+void processInput(GLFWwindow* window);                                      // 按键
+bool PRESS[TYPE_NUM] = { 0 };                                               // 按键属性，当前是否被按下
 
-// 传递点光源函数
+// 传递点光源给着色器
 void set_point_light(Shader& blinnphongshader);
 
 int main()
@@ -54,7 +52,6 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // 创建窗口
-    // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FIREWORK", NULL, NULL);
     if (window == NULL)
     {
@@ -77,27 +74,30 @@ int main()
         return -1;
     }
 
-    //帧缓冲
+    // 帧缓冲
     GLuint framebuffer;
     glGenFramebuffers(1, &framebuffer);
-    //颜色缓冲区
+
+    // 颜色缓冲区
     GLuint texColorBuffer[2];
     glGenTextures(2, texColorBuffer);
     init_framebuffer(framebuffer, texColorBuffer);
 
-    // Blur
+    // Blur效果
     GLuint BlurFBO[2];
     GLuint BlurColorbuffers[2];
     glGenFramebuffers(2, BlurFBO);
     glGenTextures(2, BlurColorbuffers);
     init_Blur(BlurFBO, BlurColorbuffers);
-    //矩形顶点
+
+    // 帧矩形顶点
     GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     init_rectangle(VAO, VBO, EBO);
 
+    // 加载着色器
     Shader ColorShader("shader/Color.vs", "shader/Color.fs");
     Shader BlurShader("shader/Result.vs", "shader/Blur.fs");
     Shader ResultShader("shader/Result.vs", "shader/Result.fs");
@@ -107,23 +107,18 @@ int main()
     // 开启深度测试
     glEnable(GL_DEPTH_TEST);
 
-    // 绑定基本图元
+    // 绑定烟花图元
     Draw draw;
 
     // 绑定天空盒
     Skybox skybox;
 
-    // 加载固定模型
+    // 绑定城堡模型
     Model castle("Castle/Castle OBJ2.obj");
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
     {
-        // 更新时间
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
         // 接收输入
         processInput(window);
 
@@ -132,16 +127,14 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // 设置普通shaer
+        // 设置烟花着色器
         ColorShader.use();
-
         // 视角变换、投影变换
         // 世界变换交给draw_firework函数
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, NEAR, FAR);
         ColorShader.setMat4("view", view);
         ColorShader.setMat4("projection", projection);
-
         // 渲染烟花系统
         // 应用烟花引擎
         for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
@@ -160,35 +153,40 @@ int main()
             }
         }
 
-        // 渲染固定模型
+        // 设置烟花着色器
         CastleShader.use();
+        // MVP变换
         CastleShader.setMat4("view", view);
         CastleShader.setMat4("projection", projection);
         glm::mat4 castleTransform = glm::mat4(1.0f);
-        // castleTransform = glm::translate(castleTransform, glm::vec3(0.0f, 0.0f, 0.0f));
         castleTransform = glm::scale(castleTransform, glm::vec3(5.0f));
         castleTransform = glm::rotate(castleTransform, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         CastleShader.setMat4("model", castleTransform);
+        // 传递点光源给着色器
         set_point_light(CastleShader);
+        // 渲染城堡模型
         castle.Draw(CastleShader);
 
-        // Sky
+        // 设置天空盒着色器
         SkyboxShader.use();
         SkyboxShader.setInt("skybox", 0);
+        // 视角变换、投影变换
         SkyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
         SkyboxShader.setMat4("projection", projection);
+        // 渲染天空盒
         skybox.Draw();
 
-        // Blur
+        // 后处理：辉光效果
         BlurShading(BlurFBO, BlurColorbuffers, texColorBuffer[1], VAO, BlurShader);
-
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         ResultShading(texColorBuffer[0], BlurColorbuffers[0], VAO, ResultShader);
 
+        // 显示渲染结果
         glfwSwapBuffers(window);
+
+        // 检查时间，更新状态
         glfwPollEvents();
     }
 
@@ -199,16 +197,15 @@ int main()
 // 判断按键并执行相应动作
 void processInput(GLFWwindow* window)
 {
+    // ESC 退出
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    //     camera.ProcessKeyboard(LEFT, deltaTime);
-    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    //     camera.ProcessKeyboard(RIGHT, deltaTime);
+    // 数字1开始 发射不同烟花类型
     for (int i = 0; i < TYPE_NUM; i++)
     {
         if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_PRESS)
         {
+            // 只有按键按下瞬间会发射烟花(松开->按下)
             if (!PRESS[i] && firework_list.size() < MAX_FIREWORK_NUMBER)
             {
                 fireworktype type = fireworktype(i);
@@ -220,6 +217,7 @@ void processInput(GLFWwindow* window)
         if (glfwGetKey(window, GLFW_KEY_1 + i) == GLFW_RELEASE)
             PRESS[i] = false;
     }
+    // E Q 调整烟花速度
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         dt = (dt + 0.01f) > 3.0f ? 3.0f : (dt + 0.01f);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
@@ -229,9 +227,9 @@ void processInput(GLFWwindow* window)
 // 窗口回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
 }
 
 

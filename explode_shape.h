@@ -1,3 +1,8 @@
+#ifndef __EXPLODE_SHAPE_H__
+#define __EXPLODE_SHAPE_H__
+
+// 本头文件用于存储各种烟花爆炸模型的顶点
+
 float diamond_vertices[] = {
 -0.452410,0.392288,0.190160,
 -0.184187,0.392288,0.451414,
@@ -537,3 +542,5 @@ float bird_vertices[] = {
 
 float* vertices_arr[] = { nullptr, nullptr, diamond_vertices, heart_vertices, bird_vertices };
 int vertices_num[] = { 0, 0, 198 / 3, 276 / 3, 1104 / 3 };
+
+#endif

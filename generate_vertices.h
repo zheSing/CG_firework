@@ -8,12 +8,15 @@
 #define M_PI 3.14159265358979323846
 using namespace std;
 
+// 球的顶点和索引
 vector<float> sphere_vertices;
 vector<int> sphere_indices;
 
+// 立方体的顶点和索引
 vector<float> cube_vertices;
 vector<int> cube_indices;
 
+// 顶点数组，索引数组
 vector<float>* vertices[] = { &sphere_vertices, &cube_vertices };
 vector<int>* indices[] = { &sphere_indices, &cube_indices };
 
@@ -52,6 +55,7 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
         }
 }
 
+// 生成立方体的顶点
 void generate_cube_vertices(vector<float>& polygon_vertices, vector<int>& polygon_indices)
 {
     float cubev[24] = {

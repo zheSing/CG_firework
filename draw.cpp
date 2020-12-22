@@ -26,6 +26,7 @@ Draw::Draw()
     }
 }
 
+// 释放缓存
 Draw::~Draw()
 {
     glDeleteVertexArrays(POLYGON_NUM, VAO);
@@ -37,13 +38,16 @@ Draw::~Draw()
 void Draw::draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm::vec4 color, polygon type, Shader& myshader)
 {
     glBindVertexArray(VAO[type]);
+    // 渲染多个位置实现拖尾
     for (int i = 0; i < pos_cnt; i++)
     {
         // 变换到中心，根据半径放缩比例
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, position[POSITION_NUMBER - 1 - i]);
-        model = glm::scale(model, glm::vec3(radius / (i + 1)*1.5));
+        // 半径逐渐减小
+        model = glm::scale(model, glm::vec3(radius / (i + 1) * 1.5));
         myshader.setMat4("model", model);
+        // 不透明度逐渐降低
         glm::vec4 fadecolor = color;
         fadecolor.w = fadecolor.w / (i + 1) * 1.5;
         myshader.setVec4("vertexColor", fadecolor);
@@ -55,16 +59,18 @@ void Draw::draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm:
 // 绘图。根据烟花参数渲染图形
 void Draw::draw_firework(vector<Firework>::iterator fw, Shader& myshader)
 {
+    // 未爆炸
     if (!fw->isExploded())
         draw_polygon(fw->getPositionArr(), fw->getPositionCnt(), fw->getRadius(), fw->getColor(), fw->getShape(), myshader);
+    // 已爆炸
     else
+    {
         for (int i = 0; i < fw->getParticleNum(); i++)
         {
             Particle* grain_ptr = fw->getParticles() + i;
             if (grain_ptr->getColor().w <= 0.0f)
-            {
                 continue;
-            }
             draw_polygon(grain_ptr->getPositionArr(), grain_ptr->getPositionCnt(), grain_ptr->getRadius(), grain_ptr->getColor(), grain_ptr->getShape(), myshader);
         }
+    }
 }

@@ -6,14 +6,13 @@
 class Firework
 {
 public:
-    Firework(fireworktype ftype); // Constructor declaration
+    Firework(fireworktype ftype);                               // 根据爆炸类型初始化烟花
     ~Firework();
-    void initialise(fireworktype ftype);
-    void move(float);
-    void explode(float);
-    // GLboolean isLaunched();
-    // void updateFramesUntilLaunch();
+    void initialise(fireworktype ftype);                        // 初始化函数
+    void move(float);                                           // 烟花运动的物理模型
+    void explode(float);                                        // 粒子爆炸的物理模型
 
+    // 获取烟花各种属性
     GLboolean isExploded();
     GLint getPositionCnt();
     glm::vec3 getPosition();
@@ -24,51 +23,49 @@ public:
     GLint getParticleNum();
     GLint getParticleAliveNum();
     Particle* getParticles();
-
     polygon getShape();
     fireworktype getType();
-
     GLfloat getLightLife();
     GLfloat getLightIntensity();
     glm::vec3 getLightColor();
 
 private:
-    GLfloat lastTime;
-    GLboolean hasExploded;
-    GLint position_cnt;                     //目前记录位置的数量，用于实现拖尾效果
-    glm::vec3 position[POSITION_NUMBER];    //记录位置的数组，用于实现拖尾效果
-    glm::vec3 velocity;
-    glm::vec4 color;
-    GLfloat radius;
-    polygon shape;
-    fireworktype type;
-    static const GLfloat GRAVITY;
-    static const GLfloat radiusScale;       //初始半径的缩放比例，用于适应世界范围
-    static const GLfloat velocityScale;     //初始速度的缩放比例，用于适应世界范围
-    static const GLfloat explodeScale;      //爆炸速度的缩放比例，用于适应世界范围
-    static const GLint minParticleNum = 15;
-    static const GLint maxParticleNum = 20;
-    GLint particleNum;
-    GLint particleAliveNum;
-    GLfloat light_life;                     //光源寿命
-    GLfloat light_intensity;                //光照强度
-    glm::vec3 light_color;                  //光源颜色
-    Particle particles[maxParticleNum * maxParticleNum];
+    GLfloat lastTime;                                           // 上一次渲染用时
+    GLboolean hasExploded;                                      // 是否已经爆炸
+    GLint position_cnt;                                         // 目前记录位置的数量，用于实现拖尾效果
+    glm::vec3 position[POSITION_NUMBER];                        // 记录位置的数组，用于实现拖尾效果
+    glm::vec3 velocity;                                         // 速度
+    glm::vec4 color;                                            // 颜色
+    GLfloat radius;                                             // 半径
+    polygon shape;                                              // 形状
+    fireworktype type;                                          // 爆炸类型
+
+    static const GLfloat GRAVITY;                               // 烟花的重力加速度
+    static const GLfloat radiusScale;                           // 初始半径的缩放比例，用于适应世界范围
+    static const GLfloat velocityScale;                         // 初始速度的缩放比例，用于适应世界范围
+    static const GLfloat explodeScale;                          // 爆炸速度的缩放比例，用于适应世界范围
+
+    static const GLint minParticleNum = 15;                     // 最小粒子数目的平方根
+    static const GLint maxParticleNum = 20;                     // 最大粒子数目的平方根
+    GLint particleNum;                                          // 粒子总数
+    GLint particleAliveNum;                                     // 存活的粒子数目(不透明度大于0)
+    Particle particles[maxParticleNum * maxParticleNum];        // 粒子
+
+    GLfloat light_life;                                         //光源寿命
+    GLfloat light_intensity;                                    //光照强度
+    glm::vec3 light_color;                                      //光源颜色
+
+    // 球形烟花与随机球形烟花的粒子初始化
     glm::vec3 getSpherePoint(GLfloat, GLfloat);
     void velocitySample(GLuint Longitude, GLuint Latitude, std::vector<glm::vec3>& vertexes);
     glm::vec3 velocitySampleRandom();
+
+    // 其他类型烟花的粒子初始化
+    void initialise_particles();
+
+    // XYZ与RGB空间互换
     glm::vec3 rgb2xyz(glm::vec3);
     glm::vec3 xyz2rgb(glm::vec3);
-
-    void initialise_particles();            //其他爆炸类型
 };
 
-/*
-修改
-1. 拖尾效果
-2. 粒子颜色受烟花颜色影响
-3. 加入缩放比例适应世界范围
-4. 粒子速度不会过分受烟花速度影响
-*/
-
-#endif // !__FIREWORK_H__
+#endif  // !__FIREWORK_H__

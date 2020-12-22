@@ -1,5 +1,7 @@
 #include "particle.h"
 
+const GLfloat Particle::GRAVITY = -2.5f;
+
 Particle::Particle()
 {
 }
@@ -75,5 +77,3 @@ void Particle::setShape(polygon shape)
 {
     this->shape = shape;
 }
-
-const GLfloat Particle::GRAVITY = -2.5f;
