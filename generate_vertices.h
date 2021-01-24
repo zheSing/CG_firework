@@ -1,3 +1,5 @@
+// 顶点生成器：生成几何体的顶点和索引数组
+
 #ifndef __GENERATE_VERTICES_H__
 #define __GENERATE_VERTICES_H__
 
@@ -20,7 +22,7 @@ vector<int> cube_indices;
 vector<float>* vertices[] = { &sphere_vertices, &cube_vertices };
 vector<int>* indices[] = { &sphere_indices, &cube_indices };
 
-// 生成球的顶点
+// 生成球的顶点和索引
 void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& polygon_indices)
 {
     polygon_indices.clear();
@@ -31,6 +33,8 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
 
     const int xymax = 5;
     const int maximum = xymax * xymax;
+
+    // 顶点数组：根据经纬线在球上取样
     for (int x = 0; x < xymax; x++)
         for (int y = 0; y < xymax; y++)
         {
@@ -43,6 +47,8 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
             sphere_vertices.push_back(yPos);
             sphere_vertices.push_back(zPos);
         }
+
+    // 索引数组：将顶点组成三角面片
     for (int i = 0;i < xymax;i++)
         for (int j = 0;j < xymax;j++)
         {
@@ -55,7 +61,7 @@ void generate_sphere_vertices(vector<float>& polygon_vertices, vector<int>& poly
         }
 }
 
-// 生成立方体的顶点
+// 生成立方体的顶点和索引
 void generate_cube_vertices(vector<float>& polygon_vertices, vector<int>& polygon_indices)
 {
     float cubev[24] = {

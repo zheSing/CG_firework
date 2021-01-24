@@ -1,13 +1,11 @@
+// Mesh：使用Learn OpenGL网站提供的头文件
+
 #ifndef MESH_H
 #define MESH_H
-
-#include <glad/glad.h> // holds all OpenGL type declarations
-
+#include <glad/glad.h> 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include "shader.h"
-
 #include <string>
 #include <vector>
 using namespace std;

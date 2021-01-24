@@ -1,4 +1,3 @@
-#version 330 core
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
 
@@ -23,35 +22,33 @@ void main()
 {
     vec4 colorv4 = texture(texture_diffuse1, vs_out.TexCoords);
     vec3 color = vec3(colorv4);
-    // vec3 color = vec3(0.0,0.0,0.0);
 
     vec3 normal = normalize(vs_out.Normal);
     // lighting
     vec3 lighting = vec3(0.0);
     vec3 viewDir = normalize(viewPos - vs_out.FragPos);
+
     for(int i = 0; i < num_lights; i++)
     {
         // diffuse
         vec3 lightDir = normalize(light_list[i].Position - vs_out.FragPos);
         float diff = max(dot(lightDir, normal), 0.0);
+
         //specular
         vec3 halfvec=normalize(viewDir+lightDir);
         float dot_spec=max(dot(halfvec, normal), 0.0);
         float specular=pow(dot_spec,64);
 
-
-        // vec3 result= light_list[i].Color * diff + vec3(specular);
         vec3 result = light_list[i].Color * diff * color + vec3(specular);
-
         // attenuation (use quadratic as we have gamma correction)
         float distance = length(vs_out.FragPos - light_list[i].Position);
         result *= 1.0 / (distance * distance);
 
-        result*=light_list[i].intensity;
+        result *= light_list[i].intensity;
         lighting += result;
     }
 
-    vec3 result=lighting+color*0.2;
+    vec3 result=lighting + color * 0.2;
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0)
         BrightColor = vec4(result, 1.0);

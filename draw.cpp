@@ -1,3 +1,5 @@
+// Draw：渲染烟花
+
 #include "draw.h"
 #include "generate_vertices.h"
 
@@ -7,7 +9,6 @@ void init_vertices()
     generate_cube_vertices(cube_vertices, cube_indices);
 }
 
-// 绑定基本图形缓存
 Draw::Draw()
 {
     init_vertices();
@@ -26,7 +27,6 @@ Draw::Draw()
     }
 }
 
-// 释放缓存
 Draw::~Draw()
 {
     glDeleteVertexArrays(POLYGON_NUM, VAO);
@@ -34,7 +34,7 @@ Draw::~Draw()
     glDeleteBuffers(POLYGON_NUM, EBO);
 }
 
-// 渲染单个图元
+
 void Draw::draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm::vec4 color, polygon type, Shader& myshader)
 {
     glBindVertexArray(VAO[type]);
@@ -56,18 +56,18 @@ void Draw::draw_polygon(glm::vec3* position, GLint pos_cnt, GLfloat radius, glm:
     }
 }
 
-// 绘图。根据烟花参数渲染图形
 void Draw::draw_firework(vector<Firework>::iterator fw, Shader& myshader)
 {
-    // 未爆炸
+    // 未爆炸：渲染一个几何体（烟花本体）
     if (!fw->isExploded())
         draw_polygon(fw->getPositionArr(), fw->getPositionCnt(), fw->getRadius(), fw->getColor(), fw->getShape(), myshader);
-    // 已爆炸
+    // 已爆炸：渲染多个几何体（烟花粒子）
     else
     {
         for (int i = 0; i < fw->getParticleNum(); i++)
         {
             Particle* grain_ptr = fw->getParticles() + i;
+            // 粒子不透明度为0即寿命结束
             if (grain_ptr->getColor().w <= 0.0f)
                 continue;
             draw_polygon(grain_ptr->getPositionArr(), grain_ptr->getPositionCnt(), grain_ptr->getRadius(), grain_ptr->getColor(), grain_ptr->getShape(), myshader);

@@ -15,10 +15,10 @@
 #include <time.h>
 using namespace std;
 
-// 烟花列表
+// 烟花列表，存储所有烟花
 vector<Firework> firework_list;
 
-// 摄像机
+// 摄像机参数
 Camera camera(glm::vec3(0.0f, 130.0f, 110.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
@@ -26,18 +26,20 @@ float NEAR = 0.1f;
 float FAR = 400.0f;
 bool firstMouse = true;
 
-// 时间
+// 时间参数
 float deltaTime = 0.1f;
 float lastFrame = 0.0f;
 
-// 烟花速度
-float dt = 2.0f;
+// 烟花速度参数
+float dt = 3.0f;
 
 // 回调函数
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);          // 鼠标移动
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);   // 鼠标缩放
 void processInput(GLFWwindow* window);                                      // 按键
-bool PRESS[TYPE_NUM] = { 0 };                                               // 按键状态，当前是否被按下
+
+// 按键状态
+bool PRESS[TYPE_NUM] = { 0 };                                               // 1~5的按键状态，当前是否被按下
 bool MOUSEPRESS = false;                                                    // 鼠标左键状态
 bool MOUSEABLE = false;                                                     // 鼠标状态
 
@@ -50,14 +52,13 @@ int main()
     srand(unsigned int(time(NULL)));
 
     // 初始化glfw设置
-    // ------------------------------
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    // 获取设备信息
+    // 根据设备信息设置屏幕宽高
     GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(pMonitor);
     SCR_WIDTH = mode->width / 1.5;
@@ -98,19 +99,19 @@ int main()
     // 辉光效果初始化
     Blur blur;
 
-    // 绑定烟花图元
+    // 加载烟花图元
     Draw draw;
 
-    // 绑定天空盒
+    // 加载天空盒
     Skybox skybox;
 
-    // 绑定城堡模型
+    // 加载城堡模型
     Model castle("Castle/Castle OBJ2.obj");
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
     {
-        // 每帧时间
+        // 根据上一帧渲染时间渲染
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -129,13 +130,12 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, NEAR, FAR);
         ColorShader.setMat4("view", view);
         ColorShader.setMat4("projection", projection);
-        // 渲染烟花系统
-        // 应用烟花引擎
+        // 渲染烟花，应用烟花引擎
         for (vector<Firework>::iterator firework_it = firework_list.begin(); firework_it != firework_list.end();)
         {
             draw.draw_firework(firework_it, ColorShader);
             firework_it->move(dt * deltaTime);
-            // 判定是否爆炸及是否生存期到
+            // 判定是否爆炸及是否寿命结束
             if (firework_it->isExploded() && firework_it->getParticleAliveNum() <= 0)
             {
                 firework_it = firework_list.erase(firework_it);
@@ -209,9 +209,9 @@ void processInput(GLFWwindow* window)
     }
     // E Q 调整烟花速度
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        dt = (dt + 0.01f) > 3.0f ? 3.0f : (dt + 0.01f);
+        dt = (dt + 0.01f) > 4.0f ? 4.0f : (dt + 0.01f);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-        dt = (dt - 0.01f) < 1.0f ? 1.0f : (dt - 0.01f);
+        dt = (dt - 0.01f) < 2.0f ? 2.0f : (dt - 0.01f);
     // 鼠标点击
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && MOUSEPRESS == false)
     {

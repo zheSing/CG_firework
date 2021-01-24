@@ -1,3 +1,5 @@
+// Particle：粒子属性以及一些预定义参数
+
 #ifndef __PARTICLE_H__
 #define __PARTICLE_H__
 

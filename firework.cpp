@@ -65,14 +65,15 @@ void Firework::initialise(fireworktype ftype)
 
 void Firework::move(float dt)
 {
+    // 已爆炸：对粒子应用物理定律
     if (this->isExploded())
     {
         this->explode(dt);
     }
-
+    // 未爆炸：对烟花应用物理定律
     else
     {
-        // 更新位置
+        // 更新位置及历史位置
         position_cnt = position_cnt + 1 < POSITION_NUMBER ? position_cnt + 1 : POSITION_NUMBER;
         for (int i = 0; i < POSITION_NUMBER - 1; i++)
         {
@@ -83,25 +84,27 @@ void Firework::move(float dt)
         // 更新速度
         velocity.y += (Firework::GRAVITY * dt);
 
-        // y方向速度为0时爆炸
-        if (velocity.y + (Firework::GRAVITY * dt) <= 0.0f)
+        // 更新后若y方向速度为小于0，爆炸产生粒子
+        if (velocity.y <= 0.0f)
         {
             velocity.y = 0;
             velocity *= 0.3;
             hasExploded = true;
             color.a = 0.0f;
 
+            // 赋予光照属性
             light_life = 2.0f;
             light_color = glm::vec3(color.r, color.g, color.b);
             light_intensity = 15000;
 
-            // 球形烟花或随机球形烟花爆炸
+            // 若为球形烟花或随机球形烟花爆炸，调用函数在球上取样生成粒子
             if (type == mudan_t || type == mudan_random_t)
             {
+                // 粒子数量随机
                 particleNum = minParticleNum + (rand() % static_cast<int>(maxParticleNum - minParticleNum + 1));
-
                 particleAliveNum = particleNum * particleNum;
 
+                // 球形烟花：单位球均匀采样得到速度
                 std::vector<glm::vec3> velSample;
                 if (type == mudan_t)
                     velocitySample(particleNum, particleNum, velSample);
@@ -111,13 +114,17 @@ void Firework::move(float dt)
 
                 for (int i = 0; i < particleNum * particleNum; i++)
                 {
+                    // 粒子初始位置为烟花爆炸位置
                     particles[i].setPositionCnt(1);
                     particles[i].setPosition(this->getPosition());
+
+                    // 粒子速度为 单位球采样+烟花速度
                     if (type == mudan_t)
                         particles[i].setVelocity(velSample[i] * explosion_speed + velocity);
                     else
                         particles[i].setVelocity(velocitySampleRandom() * explosion_speed + velocity);
 
+                    // 粒子颜色为随机取样后再乘以原烟花颜色
                     glm::vec3 xyz(
                         0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
                         0.218611598014831543f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.7708090543746948242f - 0.218611598014831543f))),
@@ -131,7 +138,6 @@ void Firework::move(float dt)
                     particles[i].setRadius(
                         Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))
                     );
-
                     particles[i].setShape(shape);
                 }
             }
@@ -147,18 +153,25 @@ void Firework::move(float dt)
 
 void Firework::explode(float dt)
 {
+    // 爆炸之后：光源寿命逐渐减少，光照强度逐渐减弱
     light_life -= dt;
     light_intensity -= 1500 * dt;
     int pNum = getParticleNum();
+
+    // 对每一个粒子应用物理定律，并且不透明度逐渐降低
     for (int i = 0; i < pNum; i++)
     {
         if (particles[i].getColor().a > 0.0f)
         {
+            // 更新位置
             particles[i].setPosition(particles[i].getPosition() + (particles[i].getVelocity() * dt));
+            // 更新速度
             particles[i].setVelocity(particles[i].getVelocity() + glm::vec3(0.0f, Particle::GRAVITY * dt, 0.0f));
 
+            // 不透明度降低
             float alphaFactor = 0.000005f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.4)));
             particles[i].setColor(particles[i].getColor() - glm::vec4(0.0f, 0.0f, 0.0f, alphaFactor * dt));
+            // 不透明度降为0时粒子寿命结束
             if (particles[i].getColor().a <= 0.0f)
             {
                 particleAliveNum--;
@@ -169,31 +182,36 @@ void Firework::explode(float dt)
 
 void Firework::initialise_particles()
 {
+    // 粒子数量为模型顶点数量
     particleNum = vertices_num[type];
     particleAliveNum = vertices_num[type];
 
-    GLfloat explosion_speed = Firework::explodeScale * (0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02))));//�ٶȴ�С�˻�����������[0.08,0.10]
+    // 爆炸速度限制在 [0.1,0.12] * explodeScale
+    GLfloat explosion_speed = Firework::explodeScale * (0.10f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.02))));
 
     for (int i = 0; i < particleNum; i++)
     {
+        // 粒子初始位置为烟花爆炸位置
         particles[i].setPositionCnt(1);
         particles[i].setPosition(this->getPosition());
+
+        // 粒子速度 = 模型顶点位置
         particles[i].setVelocity(explosion_speed * glm::vec3(vertices_arr[type][i * 3], vertices_arr[type][i * 3 + 1], vertices_arr[type][i * 3 + 2]) + velocity);
 
+        // 粒子颜色为随机取样后再乘以原烟花颜色
         glm::vec3 xyz(
             0.4273033440113067627f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.639719843864440918f - 0.4273033440113067627f))),
             0.218611598014831543f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.7708090543746948242f - 0.218611598014831543f))),
             0.0975274890661239624f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.8590958118438720703f - 0.0975274890661239624f)))
         );
-
         glm::vec4 particleColor = glm::vec4(xyz2rgb(xyz), 1.0f) * color;
         particleColor.a = 1.0f;
         particles[i].setColor(particleColor);
 
+        // 粒子半径限制在 [0.002,0.003] * radiusScale
         particles[i].setRadius(
-            Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))//��ʼ�뾶������[0.002,0.003]
+            Firework::radiusScale * (0.002f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (0.001))))
         );
-
         particles[i].setShape(shape);
     }
 }

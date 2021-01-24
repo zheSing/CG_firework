@@ -1,9 +1,10 @@
+// Shader：使用Learn OpenGL网站提供的头文件
+
 #ifndef SHADER_H
 #define SHADER_H
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
 #include <string>
 #include <fstream>
 #include <sstream>

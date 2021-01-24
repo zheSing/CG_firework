@@ -1,7 +1,10 @@
+// 本头文件用于存储各种烟花爆炸模型的顶点
+// float* vertices_arr[] 存储各个模型顶点数组的首地址
+// int vertices_num[]  存储各个模型顶点数组的顶点数量
+// 下标需要与 particle.h 中的 enum fireworktype { } 对应
+
 #ifndef __EXPLODE_SHAPE_H__
 #define __EXPLODE_SHAPE_H__
-
-// 本头文件用于存储各种烟花爆炸模型的顶点
 
 float diamond_vertices[] = {
 -0.452410,0.392288,0.190160,

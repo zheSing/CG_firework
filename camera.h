@@ -1,10 +1,11 @@
+// Camera：使用Learn OpenGL网站提供的头文件
+
 #ifndef CAMERA_H
 #define CAMERA_H
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include <vector>
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods

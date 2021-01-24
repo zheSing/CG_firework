@@ -1,3 +1,5 @@
+// Skybox：天空盒，封装缓存和渲染函数
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
@@ -56,8 +58,8 @@ float skyboxVertices[] = {
 class Skybox
 {
 private:
-    unsigned int skyboxVAO, skyboxVBO;
-    unsigned int cubemapTexture;
+    unsigned int skyboxVAO, skyboxVBO;                          // 天空盒缓存
+    unsigned int cubemapTexture;                                // 天空盒纹理
     unsigned int loadCubemap(std::vector<std::string> faces);   // 根据路径加载天空盒纹理图片
 public:
     Skybox();       // 初始化：绑定VAO，加载纹理图片
@@ -99,7 +101,7 @@ void Skybox::Draw()
     stbi_set_flip_vertically_on_load(true);
     // 改变深度测试函数，使等于1的深度能通过测试
     glDepthFunc(GL_LEQUAL);
-    // 绘制
+    // 渲染天空盒
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);

@@ -1,3 +1,5 @@
+// Blur：进行辉光处理
+
 #ifndef __SHADING_H__
 #define __SHADING_H__
 
