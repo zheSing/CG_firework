@@ -107,7 +107,7 @@ int main()
     Skybox skybox;
 
     // 加载城堡模型
-    Model castle("castle/Castle OBJ2.obj");
+    Model castle("Castle/Castle OBJ2.obj");
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
