@@ -13,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <time.h>
+#include <irrklang/irrKlang.h>
 using namespace std;
 
 // 烟花列表，存储所有烟花
@@ -53,16 +54,16 @@ int main()
 
     // 初始化glfw设置
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
     // 根据设备信息设置屏幕宽高
     GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(pMonitor);
-    SCR_WIDTH = mode->width / 1.5;
-    SCR_HEIGHT = mode->height / 1.5;
+    SCR_WIDTH = mode->width / 1.2;
+    SCR_HEIGHT = mode->height / 1.2;
 
     // 创建窗口
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FIREWORK", NULL, NULL);
@@ -201,6 +202,8 @@ void processInput(GLFWwindow* window)
                 fireworktype type = fireworktype(i);
                 Firework newfirework(type);
                 firework_list.push_back(newfirework);
+                irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
+                SoundEngine->play2D("sound/1.wav", GL_FALSE);
             }
             PRESS[i] = true;
         }
