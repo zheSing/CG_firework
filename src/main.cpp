@@ -27,6 +27,9 @@ float NEAR = 0.1f;
 float FAR = 400.0f;
 bool firstMouse = true;
 
+// 音频
+irrklang::ISoundEngine* SoundEngine;
+
 // 时间参数
 float deltaTime = 0.1f;
 float lastFrame = 0.0f;
@@ -108,6 +111,12 @@ int main()
 
     // 加载城堡模型
     Model castle("Castle/Castle OBJ2.obj");
+
+    // 初始化音频设备
+    SoundEngine = irrklang::createIrrKlangDevice();
+    SoundEngine->play2D("sound/1.wav", GL_FALSE);
+    SoundEngine->play2D("sound/2.wav", GL_FALSE);
+    SoundEngine->stopAllSounds();
 
     // 渲染循环
     while (!glfwWindowShouldClose(window))
@@ -202,7 +211,6 @@ void processInput(GLFWwindow* window)
                 fireworktype type = fireworktype(i);
                 Firework newfirework(type);
                 firework_list.push_back(newfirework);
-                irrklang::ISoundEngine* SoundEngine = irrklang::createIrrKlangDevice();
                 SoundEngine->play2D("sound/1.wav", GL_FALSE);
             }
             PRESS[i] = true;
